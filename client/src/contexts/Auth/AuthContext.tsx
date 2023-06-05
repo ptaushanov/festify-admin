@@ -1,7 +1,8 @@
 import React, { createContext, useEffect, useState, ReactNode, useContext } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
-import { auth } from '../../firebase.v9';
+import { auth, firestore } from '../../firebase.v9';
+import { collection, getDoc, doc } from 'firebase/firestore';
 
 import Loading from '../../components/Loading/Loading';
 
@@ -51,6 +52,17 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             const credentials = await signInWithEmailAndPassword(auth, email, password);
             const { user } = credentials;
+
+            const adminCollection = collection(firestore, 'admins')
+            const adminDoc = doc(adminCollection, user.uid)
+            const userDoc = await getDoc(adminDoc);
+
+            if (!userDoc.exists()) {
+                await signOut();
+                setError('User is not an admin');
+                setIsError(true);
+                return false
+            }
 
             setCurrentUser(user);
             return true

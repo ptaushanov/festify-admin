@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { ReactNode, useState } from 'react'
-import trpc from '../../utils/trpc';
+import trpc from '../../services/trpc';
 
 const serverURL = import.meta.env.VITE_SERVER_URL;
 

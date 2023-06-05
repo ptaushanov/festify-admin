@@ -57,7 +57,7 @@ export default function SignIn() {
                             {...register("email")}
                         />
                         <label className="label">
-                            <span className="label-text-alt text-error">
+                            <span className="label-text-alt text-error font-semibold">
                                 {errors.email?.message}
                             </span>
                         </label>
@@ -73,17 +73,21 @@ export default function SignIn() {
                             {...register("password")}
                         />
                         <label className="label">
-                            <span className="label-text-alt text-error">
+                            <span className="label-text-alt text-error font-semibold">
                                 {errors.password?.message}
                             </span>
                         </label>
                     </div>
-                    {isError && (<span className="label-text-alt text-error">
-                        {error}
-                    </span>)}
-                    <button type="submit" className="btn btn-primary rounded-md mt-10 mb-12">
-                        Sign In
-                    </button>
+                    <div className="flex-1 flex flex-col mt-6">
+                        {isError && (
+                            <span className="label-text-alt text-error font-semibold text-center">
+                                {error}
+                            </span>
+                        )}
+                        <button type="submit" className="btn mt-4 btn-primary rounded-md mb-12">
+                            Sign In
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
