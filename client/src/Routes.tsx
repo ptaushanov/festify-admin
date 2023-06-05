@@ -1,8 +1,10 @@
 import { lazy, Suspense, ComponentType } from "react"
-import { Routes as Switch, Route } from "react-router-dom"
+import { Routes as Switch, Route, Navigate } from "react-router-dom"
 import SidebarLayout from "./layouts/SidebarLayout";
 import Loading from "./components/Loading/Loading"
 import NotFound from "./pages/404/404";
+
+import { useAuth } from "./contexts/Auth/AuthContext";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -31,30 +33,48 @@ const withSuspense = <P extends object>(
     );
 }
 
+const withPrivateRoute = <P extends object>(
+    WrappedComponent: ComponentType<P>
+): React.FC<P> => {
+    return (props: P) => {
+        const { currentUser } = useAuth()
+        if (!currentUser) return <Navigate to="/sign-in" replace />
+        return <WrappedComponent {...props} />
+    }
+}
+
 // Pages with layout and lazy loading
 const Home = lazy(() => import("./pages/Home/Home"))
 const HomeWithLayout = withLayout(SidebarLayout, Home)
+const HomeWithPrivateRoute = withPrivateRoute(HomeWithLayout)
 
 const Admins = lazy(() => import("./pages/Admins/Admins"))
 const AdminsWithLayout = withLayout(SidebarLayout, Admins)
+const AdminsWithPrivateRoute = withPrivateRoute(AdminsWithLayout)
 
 const Users = lazy(() => import("./pages/Users/Users"))
 const UsersWithLayout = withLayout(SidebarLayout, Users)
+const UsersWithPrivateRoute = withPrivateRoute(UsersWithLayout)
 
 const Seasons = lazy(() => import("./pages/Seasons/Seasons"))
 const SeasonsWithLayout = withLayout(SidebarLayout, Seasons)
+const SeasonsWithPrivateRoute = withPrivateRoute(SeasonsWithLayout)
 
 const Lessons = lazy(() => import("./pages/Lessons/Lessons"))
 const LessonsWithLayout = withLayout(SidebarLayout, Lessons)
+const LessonsWithPrivateRoute = withPrivateRoute(LessonsWithLayout)
 
 const Rewards = lazy(() => import("./pages/Rewards/Rewards"))
 const RewardsWithLayout = withLayout(SidebarLayout, Rewards)
+const RewardsWithPrivateRoute = withPrivateRoute(RewardsWithLayout)
 
 const Notifications = lazy(() => import("./pages/Notifications/Notifications"))
 const NotificationsWithLayout = withLayout(SidebarLayout, Notifications)
+const NotificationsWithPrivateRoute = withPrivateRoute(NotificationsWithLayout)
 
 const Emails = lazy(() => import("./pages/Emails/Emails"))
 const EmailsWithLayout = withLayout(SidebarLayout, Emails)
+const EmailsWithPrivateRoute = withPrivateRoute(EmailsWithLayout)
 
 const SignIn = lazy(() => import("./pages/SignIn/SignIn"))
 const SignInWithSuspense = withSuspense(SignIn)
@@ -65,41 +85,41 @@ export default function Routes() {
             {/* General */}
             <Route
                 path="/"
-                element={<HomeWithLayout />}
+                element={<HomeWithPrivateRoute />}
             />
 
             {/* Content */}
             <Route
                 path="/lessons"
-                element={<LessonsWithLayout />}
+                element={<LessonsWithPrivateRoute />}
             />
             <Route
                 path="/seasons"
-                element={<SeasonsWithLayout />}
+                element={<SeasonsWithPrivateRoute />}
             />
             <Route
                 path="/rewards"
-                element={<RewardsWithLayout />}
+                element={<RewardsWithPrivateRoute />}
             />
 
             {/* Notifications */}
             <Route
                 path="/notifications"
-                element={<NotificationsWithLayout />}
+                element={<NotificationsWithPrivateRoute />}
             />
             <Route
                 path="/emails"
-                element={<EmailsWithLayout />}
+                element={<EmailsWithPrivateRoute />}
             />
 
             {/* Administration */}
             <Route
                 path="/users"
-                element={<UsersWithLayout />}
+                element={<UsersWithPrivateRoute />}
             />
             <Route
                 path="/admins"
-                element={<AdminsWithLayout />}
+                element={<AdminsWithPrivateRoute />}
             />
 
             {/* Sign In */}

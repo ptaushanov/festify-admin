@@ -2,15 +2,18 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom';
 import Routes from './Routes'
-import TRPCProvider from './components/TRPC/trpc';
+import TRPCProvider from './contexts/TRPC/trpc';
+import { AuthProvider } from './contexts/Auth/AuthContext';
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <TRPCProvider>
-      <BrowserRouter>
-        <Routes />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes />
+        </BrowserRouter>
+      </AuthProvider>
     </TRPCProvider>
   </React.StrictMode>,
 )
