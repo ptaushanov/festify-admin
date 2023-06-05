@@ -59,9 +59,6 @@ const EmailsWithLayout = withLayout(SidebarLayout, Emails)
 const SignIn = lazy(() => import("./pages/SignIn/SignIn"))
 const SignInWithSuspense = withSuspense(SignIn)
 
-const SignUp = lazy(() => import("./pages/SignUp/SignUp"))
-const SignUpWithSuspense = withSuspense(SignUp)
-
 export default function Routes() {
     return (
         <Switch>
@@ -105,14 +102,10 @@ export default function Routes() {
                 element={<AdminsWithLayout />}
             />
 
-            {/* Sign In / Sign Up */}
+            {/* Sign In */}
             <Route
                 path="/sign-in"
                 element={<SignInWithSuspense />}
-            />
-            <Route
-                path="/sign-up"
-                element={<SignUpWithSuspense />}
             />
 
             {/* Not Found */}
