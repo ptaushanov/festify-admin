@@ -1,40 +1,66 @@
-import { lazy, LazyExoticComponent, Suspense } from "react"
+import { lazy, Suspense, ComponentType } from "react"
 import { Routes as Switch, Route } from "react-router-dom"
+import SidebarLayout from "./layouts/SidebarLayout";
 import Loading from "./components/Loading/Loading"
 import NotFound from "./pages/404/404";
 
-const withSuspense = (WrappedComponent: LazyExoticComponent<() => JSX.Element>) => {
-    return () => (
-        <Suspense fallback={<Loading />}>
-            <WrappedComponent />
-        </Suspense>
+interface LayoutProps {
+    children: React.ReactNode;
+}
+
+const withLayout = <P extends object>(
+    LayoutComponent: ComponentType<LayoutProps>,
+    WrappedComponent: ComponentType<P>
+): React.FC<P> => {
+    return (props: P) => (
+        <LayoutComponent>
+            <Suspense fallback={<Loading />}>
+                <WrappedComponent {...props} />
+            </Suspense>
+        </LayoutComponent>
     );
 };
 
+const withSuspense = <P extends object>(
+    WrappedComponent: ComponentType<P>
+): React.FC<P> => {
+    return (props: P) => (
+        <Suspense fallback={<Loading />}>
+            <WrappedComponent {...props} />
+        </Suspense>
+    );
+}
+
 // Pages with layout and lazy loading
 const Home = lazy(() => import("./pages/Home/Home"))
-const HomeWithSuspense = withSuspense(Home)
+const HomeWithLayout = withLayout(SidebarLayout, Home)
 
 const Admins = lazy(() => import("./pages/Admins/Admins"))
-const AdminsWithSuspense = withSuspense(Admins)
+const AdminsWithLayout = withLayout(SidebarLayout, Admins)
 
 const Users = lazy(() => import("./pages/Users/Users"))
-const UsersWithSuspense = withSuspense(Users)
+const UsersWithLayout = withLayout(SidebarLayout, Users)
 
 const Seasons = lazy(() => import("./pages/Seasons/Seasons"))
-const SeasonsWithSuspense = withSuspense(Seasons)
+const SeasonsWithLayout = withLayout(SidebarLayout, Seasons)
 
 const Lessons = lazy(() => import("./pages/Lessons/Lessons"))
-const LessonsWithLayout = withSuspense(Lessons)
+const LessonsWithLayout = withLayout(SidebarLayout, Lessons)
 
 const Rewards = lazy(() => import("./pages/Rewards/Rewards"))
-const RewardsWithSuspense = withSuspense(Rewards)
+const RewardsWithLayout = withLayout(SidebarLayout, Rewards)
 
 const Notifications = lazy(() => import("./pages/Notifications/Notifications"))
-const NotificationsWithSuspense = withSuspense(Notifications)
+const NotificationsWithLayout = withLayout(SidebarLayout, Notifications)
 
 const Emails = lazy(() => import("./pages/Emails/Emails"))
-const EmailsWithSuspense = withSuspense(Emails)
+const EmailsWithLayout = withLayout(SidebarLayout, Emails)
+
+const SignIn = lazy(() => import("./pages/SignIn/SignIn"))
+const SignInWithSuspense = withSuspense(SignIn)
+
+const SignUp = lazy(() => import("./pages/SignUp/SignUp"))
+const SignUpWithSuspense = withSuspense(SignUp)
 
 export default function Routes() {
     return (
@@ -42,7 +68,7 @@ export default function Routes() {
             {/* General */}
             <Route
                 path="/"
-                element={<HomeWithSuspense />}
+                element={<HomeWithLayout />}
             />
 
             {/* Content */}
@@ -52,34 +78,44 @@ export default function Routes() {
             />
             <Route
                 path="/seasons"
-                element={<SeasonsWithSuspense />}
+                element={<SeasonsWithLayout />}
             />
             <Route
                 path="/rewards"
-                element={<RewardsWithSuspense />}
+                element={<RewardsWithLayout />}
             />
 
             {/* Notifications */}
             <Route
                 path="/notifications"
-                element={<NotificationsWithSuspense />}
+                element={<NotificationsWithLayout />}
             />
             <Route
                 path="/emails"
-                element={<EmailsWithSuspense />}
+                element={<EmailsWithLayout />}
             />
 
             {/* Administration */}
             <Route
                 path="/users"
-                element={<UsersWithSuspense />}
+                element={<UsersWithLayout />}
             />
             <Route
                 path="/admins"
-                element={<AdminsWithSuspense />}
+                element={<AdminsWithLayout />}
             />
 
-            {/* 404 Not Found */}
+            {/* Sign In / Sign Up */}
+            <Route
+                path="/sign-in"
+                element={<SignInWithSuspense />}
+            />
+            <Route
+                path="/sign-up"
+                element={<SignUpWithSuspense />}
+            />
+
+            {/* Not Found */}
             <Route
                 path="*"
                 element={<NotFound />}
