@@ -1,5 +1,5 @@
 import { lazy, Suspense, ComponentType } from "react"
-import { Routes as Switch, Route, Navigate } from "react-router-dom"
+import { Routes as Switch, Route, Navigate, useLocation } from "react-router-dom"
 import SidebarLayout from "./layouts/SidebarLayout";
 import Loading from "./components/Loading/Loading"
 import NotFound from "./pages/404/404";
@@ -38,7 +38,11 @@ const withPrivateRoute = <P extends object>(
 ): React.FC<P> => {
     return (props: P) => {
         const { currentUser } = useAuth()
-        if (!currentUser) return <Navigate to="/sign-in" replace />
+        const location = useLocation();
+
+        if (!currentUser) return (
+            <Navigate to={`/sign-in?redirect=${encodeURIComponent(location.pathname)}`} replace />
+        )
         return <WrappedComponent {...props} />
     }
 }

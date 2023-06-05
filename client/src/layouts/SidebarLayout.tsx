@@ -8,9 +8,12 @@ import {
     StarIcon,
     EnvelopeIcon
 } from "@heroicons/react/24/outline"
-import { NavLink } from "react-router-dom"
+import { NavLink } from 'react-router-dom';
+import { useAuth } from "../contexts/Auth/AuthContext";
 
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
+    const { signOut } = useAuth();
+
     return (
         <div className="h-screen overflow-clip">
             <div className="navbar bg-base-100">
@@ -32,7 +35,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                                 </a>
                             </li>
                             <li><a>Settings</a></li>
-                            <li><a>Logout</a></li>
+                            <li><a onClick={signOut}>Logout</a></li>
                         </ul>
                     </div>
                 </div>

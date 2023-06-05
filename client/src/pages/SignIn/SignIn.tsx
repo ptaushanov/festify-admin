@@ -1,4 +1,33 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuth } from "../../contexts/Auth/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const signInSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(1, "Please provide a password")
+});
+
+type SignInType = z.infer<typeof signInSchema>;
+
 export default function SignIn() {
+    const { search } = useLocation();
+    const navigate = useNavigate();
+
+    const query = new URLSearchParams(search);
+    const redirect = query.get("redirect");
+
+    const { register, handleSubmit, formState: { errors } } = useForm<SignInType>({
+        resolver: zodResolver(signInSchema),
+    });
+
+    const { signIn, isError, error } = useAuth();
+    const onSubmit = async ({ email, password }: SignInType) => {
+        const isSignedIn = await signIn(email, password)
+        if (isSignedIn) navigate(redirect || "/")
+    };
+
     return (
         <div className="bg-base-200 flex-1 flex justify-center items-center -mt-10">
             <div className="card bg-base-100 w-[30rem] rounded-lg shadow-sm flex flex-col items-center">
@@ -13,7 +42,10 @@ export default function SignIn() {
                 <p className="text-base-content mt-5 font-semibold">
                     Enter your credentials to continue
                 </p>
-                <div className="flex flex-col w-3/4 mt-8">
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="flex flex-col w-3/4 mt-8"
+                >
                     <div className="form-control">
                         <label className="label">
                             <span className="label-text font-semibold">Email</span>
@@ -22,7 +54,13 @@ export default function SignIn() {
                             type="text"
                             placeholder="example@example.com"
                             className="input input-bordered input-md focus:input-primary"
+                            {...register("email")}
                         />
+                        <label className="label">
+                            <span className="label-text-alt text-error">
+                                {errors.email?.message}
+                            </span>
+                        </label>
                     </div>
                     <div className="form-control">
                         <label className="label">
@@ -32,12 +70,21 @@ export default function SignIn() {
                             type="password"
                             placeholder="****************"
                             className="input input-bordered input-md focus:input-primary"
+                            {...register("password")}
                         />
+                        <label className="label">
+                            <span className="label-text-alt text-error">
+                                {errors.password?.message}
+                            </span>
+                        </label>
                     </div>
-                    <button className="btn btn-primary rounded-md mt-10 mb-12">
+                    {isError && (<span className="label-text-alt text-error">
+                        {error}
+                    </span>)}
+                    <button type="submit" className="btn btn-primary rounded-md mt-10 mb-12">
                         Sign In
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     )

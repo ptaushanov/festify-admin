@@ -12,8 +12,8 @@ interface User {
 
 interface AuthContextProps {
     currentUser: User | null;
-    signIn: (email: string, password: string) => Promise<void>;
-    signOut: () => Promise<void>;
+    signIn: (email: string, password: string) => Promise<boolean>;
+    signOut: () => Promise<boolean>;
     isError: boolean;
     error: string | null;
 }
@@ -53,11 +53,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const { user } = credentials;
 
             setCurrentUser(user);
+            return true
         } catch (error) {
             if (error instanceof FirebaseError) {
                 setError(error.message);
                 setIsError(true);
             }
+            return false
         }
     };
 
@@ -66,11 +68,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setError(null);
             setIsError(false);
             await auth.signOut();
+            return true
         } catch (error) {
             if (error instanceof FirebaseError) {
                 setError(error.message);
                 setIsError(true);
             }
+            return false
         }
     };
 
