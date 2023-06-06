@@ -1,10 +1,14 @@
-import { initializeApp } from 'firebase-admin/app';
-import { credential, firestore } from 'firebase-admin';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
-import serviceAccount from '../adminsdk-cert.json';
+const filePath = 'build/adminsdk-cert.json';
+const absolutePath = resolve(filePath);
+const serviceAccount = JSON.parse(readFileSync(absolutePath, 'utf8'));
 
 export const app = initializeApp({
-    credential: credential.cert(serviceAccount as any),
+    credential: cert(serviceAccount),
 });
 
-export const db = firestore(app);
+export const db = getFirestore(app);

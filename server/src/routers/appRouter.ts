@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { router } from '../trpc';
-import protectedProcedure from '../procedures/protectedProcedure';
+import { router } from '../trpc.js';
+import protectedProcedure from '../procedures/protectedProcedure.js';
 
 const ZodUser = z.object({
     id: z.number().optional(),

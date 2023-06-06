@@ -1,4 +1,4 @@
-import { middleware } from '../trpc'
+import { middleware } from '../trpc.js'
 import { DecodedIdToken, getAuth } from 'firebase-admin/auth'
 import { TRPCError } from '@trpc/server';
 
@@ -39,6 +39,7 @@ const verifyToken = async (token: string) => {
 
 const authMiddleware = middleware(async ({ ctx, next }) => {
     const token = ctx.req.headers.authorization
+    console.error('token', token)
 
     if (!token) {
         throw new TRPCError({

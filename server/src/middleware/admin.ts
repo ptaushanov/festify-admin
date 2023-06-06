@@ -1,5 +1,5 @@
-import { middleware } from '../trpc'
-import { db } from '../firebase-admin';
+import { middleware } from '../trpc.js'
+import { db } from '../firebase-admin.js';
 import { TRPCError } from '@trpc/server';
 
 const verifyUserIsAdmin = async (uid: string) => {

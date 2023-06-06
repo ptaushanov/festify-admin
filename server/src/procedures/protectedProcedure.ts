@@ -1,8 +1,8 @@
-import { t } from '../trpc'
-import authMiddleware from '../middleware/auth'
-import adminMiddleware from '../middleware/admin'
+import { publicProcedure } from '../trpc.js'
+import authMiddleware from '../middleware/auth.js'
+import adminMiddleware from '../middleware/admin.js'
 
-const protectedProcedure = t.procedure
+const protectedProcedure = publicProcedure
     .use(authMiddleware)
     .use(adminMiddleware)
 

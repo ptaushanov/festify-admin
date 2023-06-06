@@ -12,7 +12,7 @@ interface TRPCProviderProps {
 
 export default function TRPCProvider({ children }: TRPCProviderProps) {
     const { token } = useAuth();
-    const headers = { authorization: token || '' }
+    const headers = { authorization: '' }
 
     const [queryClient] = useState(() => new QueryClient());
     const [trpcClient] = useState(() =>
