@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { publicProcedure, router } from '../trpc';
+import { router } from '../trpc';
+import protectedProcedure from '../procedures/protectedProcedure';
 
 const ZodUser = z.object({
     id: z.number().optional(),
@@ -24,12 +25,12 @@ const users: Record<string, User> = {
 };
 
 export const appRouter = router({
-    getUserById: publicProcedure
+    getUserById: protectedProcedure
         .input(z.number())
         .query((opts) => {
             return users[opts.input];
         }),
-    createUser: publicProcedure
+    createUser: protectedProcedure
         .input(ZodUser)
         .mutation((opts) => {
             const id = _id++
