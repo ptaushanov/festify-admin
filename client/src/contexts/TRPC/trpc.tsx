@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { ReactNode, useState } from 'react'
 import trpc from '../../services/trpc';
+import { useAuth } from '../Auth/AuthContext';
 
 const serverURL = import.meta.env.VITE_SERVER_URL;
 
@@ -10,9 +11,8 @@ interface TRPCProviderProps {
 }
 
 export default function TRPCProvider({ children }: TRPCProviderProps) {
-    const headers = async () => ({
-        Authorization: "Bearer " + localStorage.getItem("token"),
-    })
+    const { token } = useAuth();
+    const headers = { authorization: token || '' }
 
     const [queryClient] = useState(() => new QueryClient());
     const [trpcClient] = useState(() =>

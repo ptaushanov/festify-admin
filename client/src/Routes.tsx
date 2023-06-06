@@ -60,9 +60,9 @@ const Users = lazy(() => import("./pages/Users/Users"))
 const UsersWithLayout = withLayout(SidebarLayout, Users)
 const UsersWithPrivateRoute = withPrivateRoute(UsersWithLayout)
 
-const Seasons = lazy(() => import("./pages/Seasons/Seasons"))
-const SeasonsWithLayout = withLayout(SidebarLayout, Seasons)
-const SeasonsWithPrivateRoute = withPrivateRoute(SeasonsWithLayout)
+const Timelines = lazy(() => import("./pages/Timelines/Timelines"))
+const TimelinesWithLayout = withLayout(SidebarLayout, Timelines)
+const TimelinesWithPrivateRoute = withPrivateRoute(TimelinesWithLayout)
 
 const Lessons = lazy(() => import("./pages/Lessons/Lessons"))
 const LessonsWithLayout = withLayout(SidebarLayout, Lessons)
@@ -98,8 +98,8 @@ export default function Routes() {
                 element={<LessonsWithPrivateRoute />}
             />
             <Route
-                path="/seasons"
-                element={<SeasonsWithPrivateRoute />}
+                path="/timelines"
+                element={<TimelinesWithPrivateRoute />}
             />
             <Route
                 path="/rewards"

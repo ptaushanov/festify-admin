@@ -1,12 +1,12 @@
 import {
     HomeIcon,
-    RectangleGroupIcon,
     UserGroupIcon,
     UsersIcon,
     ChatBubbleLeftEllipsisIcon,
     AcademicCapIcon,
     StarIcon,
-    EnvelopeIcon
+    EnvelopeIcon,
+    CubeIcon
 } from "@heroicons/react/24/outline"
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../contexts/Auth/AuthContext";
@@ -61,9 +61,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                         <div className="divider h-0.5 my-2"></div>
                         <p className="menu-title">Content</p>
                         <li>
-                            <NavLink to="/seasons" className="p-3 focus:bg-neutral">
-                                <RectangleGroupIcon className="w-5 h-5 ml-3" />
-                                <span className="ml-2 text-md">Seasons</span>
+                            <NavLink to="/timelines" className="p-3 focus:bg-neutral">
+                                <CubeIcon className="w-5 h-5 ml-3" />
+                                <span className="ml-2 text-md">Timelines</span>
                             </NavLink>
                         </li>
                         <li>

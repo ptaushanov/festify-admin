@@ -1,15 +1,11 @@
 import React, { createContext, useEffect, useState, ReactNode, useContext } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { auth, firestore } from '../../firebase.v9';
 import { collection, getDoc, doc } from 'firebase/firestore';
+import { User } from 'firebase/auth';
 
 import Loading from '../../components/Loading/Loading';
-
-interface User {
-    uid: string;
-    email?: string | null;
-}
 
 interface AuthContextProps {
     currentUser: User | null;
@@ -17,6 +13,7 @@ interface AuthContextProps {
     signOut: () => Promise<boolean>;
     isError: boolean;
     error: string | null;
+    token: string | null;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -30,20 +27,27 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isError, setIsError] = useState<boolean>(false);
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                const { uid, email } = user;
-                setCurrentUser({ uid, email });
+                setCurrentUser({ ...user });
+                setUserToken(user);
             } else {
                 setCurrentUser(null);
+                setToken(null);
             }
             setIsLoading(false);
         });
 
         return () => unsubscribe();
     }, []);
+
+    const setUserToken = async (user: User) => {
+        const token = await getIdToken(user);
+        setToken(token);
+    }
 
     const signIn = async (email: string, password: string) => {
         try {
@@ -96,6 +100,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signOut,
         isError,
         error,
+        token
     };
 
     if (isLoading) return <Loading />
