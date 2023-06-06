@@ -1,7 +1,5 @@
-import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
-
-import { Context } from '../contexts/context.js';
+import { publicProcedure, router } from '../trpc';
 
 const ZodUser = z.object({
     id: z.number().optional(),
@@ -25,11 +23,7 @@ const users: Record<string, User> = {
     },
 };
 
-export const t = initTRPC.context<Context>().create();
-export const router = t.router;
-export const publicProcedure = t.procedure;
-
-export const appRouter = t.router({
+export const appRouter = router({
     getUserById: publicProcedure
         .input(z.number())
         .query((opts) => {

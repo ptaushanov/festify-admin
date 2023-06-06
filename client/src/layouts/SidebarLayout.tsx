@@ -8,7 +8,7 @@ import {
     StarIcon,
     EnvelopeIcon
 } from "@heroicons/react/24/outline"
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../contexts/Auth/AuthContext";
 
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         <div className="h-screen overflow-clip">
             <div className="navbar bg-base-100">
                 <div className="flex-1">
-                    <a className="btn btn-ghost normal-case text-xl">Festify Admin</a>
+                    <Link to="/" className="btn btn-ghost normal-case text-xl">
+                        Festify Admin
+                    </Link>
                 </div>
                 <div className="flex-none gap-2">
                     <div className="dropdown dropdown-end">
