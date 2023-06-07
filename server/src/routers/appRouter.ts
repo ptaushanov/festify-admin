@@ -1,45 +1,8 @@
-import { z } from 'zod';
 import { router } from '../trpc.js';
-import protectedProcedure from '../procedures/protectedProcedure.js';
-
-const ZodUser = z.object({
-    id: z.number().optional(),
-    name: z.string().min(3),
-    bio: z.string().max(142).optional(),
-});
-
-type User = z.infer<typeof ZodUser>;
-
-let _id = 0;
-const users: Record<string, User> = {
-    0: {
-        id: 0,
-        name: 'Alice',
-        bio: 'I like turtles',
-    },
-    1: {
-        id: 1,
-        name: 'Bob',
-        bio: 'I like trains',
-    },
-};
+import { timelineRouter } from './timelineRouter.js';
 
 export const appRouter = router({
-    getUserById: protectedProcedure
-        .input(z.number())
-        .query((opts) => {
-            return users[opts.input];
-        }),
-    createUser: protectedProcedure
-        .input(ZodUser)
-        .mutation((opts) => {
-            const id = _id++
-            const user: User = { id, ...opts.input };
-            users[id] = user;
-
-            console.info(`Created a new user with id ${user.id}`);
-            return user;
-        }),
+    timeline: timelineRouter
 });
 
 // export type definition of API

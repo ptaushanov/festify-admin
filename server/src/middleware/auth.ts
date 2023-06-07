@@ -39,7 +39,6 @@ const verifyToken = async (token: string) => {
 
 const authMiddleware = middleware(async ({ ctx, next }) => {
     const token = ctx.req.headers.authorization
-    console.error('token', token)
 
     if (!token) {
         throw new TRPCError({

@@ -9,13 +9,15 @@ import {
     CubeIcon
 } from "@heroicons/react/24/outline"
 import { NavLink, Link } from 'react-router-dom';
+import { Toaster } from "react-hot-toast";
+
 import { useAuth } from "../contexts/Auth/AuthContext";
 
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
     const { signOut } = useAuth();
 
     return (
-        <div className="h-screen overflow-clip">
+        <div className="h-screen overflow-hidden">
             <div className="navbar bg-base-100">
                 <div className="flex-1">
                     <Link to="/" className="btn btn-ghost normal-case text-xl">
@@ -46,8 +48,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 <input type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content flex flex-col p-10 bg-base-200">
                     {children}
+                    <Toaster position="bottom-center" toastOptions={{ duration: 3000 }} />
                 </div>
-                <div className="drawer-side">
+                <div className="drawer-side h-full">
                     <ul className="menu p-4 w-64 h-full bg-base-100 text-base-content">
 
                         <p className="menu-title">General</p>
