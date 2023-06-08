@@ -1,4 +1,5 @@
 import { RefObject, useRef, useState } from 'react'
+import trpc from '../../../services/trpc';
 
 type Holiday = {
     id: number;
@@ -9,19 +10,29 @@ type Holiday = {
 
 interface LessonEditModalProps {
     modalRef: RefObject<HTMLDialogElement>
-    holiday: Holiday | null
+    holiday: Holiday | null,
+    season: "spring" | "summer" | "autumn" | "winter";
 }
 
-function LessonEditModal({ modalRef, holiday }: LessonEditModalProps) {
+function LessonEditModal({ modalRef, holiday, season }: LessonEditModalProps) {
     const [thumbnail, setThumbnail] = useState<string | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
     const allowedExtensions = ["jpg", "jpeg", "png"]
+
+    const lessonMutation = trpc.timeline.updateHoliday.useMutation()
 
     const handleEditLesson = () => {
         if (!formRef.current) return
         const formData = new FormData(formRef.current)
         const celebratedOn = formData.get("celebrated_on") as string
-
+        lessonMutation.mutate({
+            season,
+            index: holiday?.id ?? 0,
+            holiday: {
+                celebrated_on: celebratedOn,
+                thumbnail: thumbnail ?? undefined,
+            }
+        })
     }
 
     const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +64,7 @@ function LessonEditModal({ modalRef, holiday }: LessonEditModalProps) {
                                 </label>
                                 <input
                                     type="text"
+                                    name="celebrated_on"
                                     className="input input-bordered w-full"
                                     defaultValue={holiday?.celebrated_on}
                                 />
@@ -65,7 +77,6 @@ function LessonEditModal({ modalRef, holiday }: LessonEditModalProps) {
                                 </label>
                                 <input
                                     type="text"
-                                    name="name"
                                     className="input input-bordered w-full input-disabled"
                                     defaultValue={holiday?.name}
                                 />

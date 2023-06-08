@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState, ReactNode, useContext } from 'react';
-import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { auth, firestore } from '../../firebase.v9';
 import { collection, getDoc, doc } from 'firebase/firestore';
@@ -34,7 +34,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
                 setCurrentUser({ ...user });
-                setUserToken(user);
+                setUserToken();
             } else {
                 setCurrentUser(null);
                 setToken(null);
@@ -45,16 +45,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    const setUserToken = async (user: User) => {
-        console.log('setting user token')
-        const token = await getIdToken(user);
-        console.log('token', token)
+    const setUserToken = async () => {
+        const token = await auth.currentUser?.getIdToken() ?? null;
         setToken(token);
-    }
-
-    const refreshUserToken = async () => {
-        if (!currentUser) throw new Error("User is not logged in")
-        await setUserToken(currentUser);
     }
 
     const signIn = async (email: string, password: string) => {
@@ -109,7 +102,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isError,
         error,
         token,
-        refreshUserToken
+        refreshUserToken: setUserToken
     };
 
     if (isLoading) return <Loading />

@@ -9,7 +9,6 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
 import { useRef, useState } from "react";
-import toast from "react-hot-toast";
 import ImageCell from "./components/ImageCell";
 import { CellDblClickEvent } from "devextreme/ui/data_grid";
 
@@ -116,7 +115,7 @@ export default function Timelines() {
             </div>
 
             {/* Modal */}
-            <LessonEditModal modalRef={modalRef} holiday={selectedHoliday} />
+            <LessonEditModal modalRef={modalRef} holiday={selectedHoliday} season={selectedSeason} />
         </div >
     )
 }
