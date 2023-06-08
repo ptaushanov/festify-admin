@@ -8,13 +8,13 @@ import DataGrid, {
     Item,
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import ImageCell from "./components/ImageCell";
 import { CellDblClickEvent } from "devextreme/ui/data_grid";
-import Button from "devextreme-react/button";
 
-import { BookOpenIcon, LightBulbIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
+import { LightBulbIcon } from "@heroicons/react/24/outline"
+import LessonEditModal from "./components/LessonEditModal";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
@@ -28,19 +28,12 @@ type Holiday = {
 export default function Timelines() {
     const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
     const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
+    const modalRef = useRef<HTMLDialogElement>(null);
 
     const pageSizes = [5, 10, 20]
 
     const { data } = trpc.timeline.getSeasonTimeline
-        .useQuery(
-            { season: selectedSeason },
-            {
-                onError: (error) => toast.error(error.message),
-                refetchOnMount: "always",
-                retry: 3,
-                retryDelay: 1000
-            }
-        );
+        .useQuery({ season: selectedSeason });
 
     const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedSeason(event.target.value as Season);
@@ -49,6 +42,7 @@ export default function Timelines() {
     const handleTimelineLessonChange = (event: CellDblClickEvent<Holiday, any>) => {
         const { data } = event
         setSelectedHoliday(data)
+        modalRef.current?.showModal()
     }
 
     return (
@@ -120,6 +114,9 @@ export default function Timelines() {
                     <p>Tip: Double click a lesson to edit it</p>
                 </div>
             </div>
+
+            {/* Modal */}
+            <LessonEditModal modalRef={modalRef} holiday={selectedHoliday} />
         </div >
     )
 }

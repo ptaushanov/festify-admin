@@ -46,7 +46,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     const setUserToken = async (user: User) => {
+        console.log('setting user token')
         const token = await getIdToken(user);
+        console.log('token', token)
         setToken(token);
     }
 

@@ -1,8 +1,10 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
 import { ReactNode, useState } from 'react'
-import trpc from '../../services/trpc';
+import { AppRouter } from '../../../../server/src/routers/appRouter';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TRPCClientError, httpBatchLink } from '@trpc/client';
 import { useAuth } from '../Auth/AuthContext';
+import trpc from '../../services/trpc';
+import toast from 'react-hot-toast';
 
 const serverURL = import.meta.env.VITE_SERVER_URL;
 
@@ -23,10 +25,37 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
         }),
     );
 
+    const handleTRPCClientError = async (error: TRPCClientError<AppRouter>) => {
+        toast.error(error.message);
+
+        const isUnauthorized = error.data?.code === 'UNAUTHORIZED';
+        if (!isUnauthorized) return;
+
+        toast.loading('Refreshing user credentials');
+        await refreshUserToken();
+        toast.success('Credentials refreshed!');
+    }
+
+    const handleErrorResponse = (error: unknown) => {
+        const isTRPCClientError = error instanceof TRPCClientError<AppRouter>
+        if (isTRPCClientError) return handleTRPCClientError(error)
+
+        const isGenericError = error instanceof Error;
+        if (isGenericError) toast.error(error.message);
+    }
+
     queryClient.setDefaultOptions({
         queries: {
-            onError: refreshUserToken
+            onError: handleErrorResponse,
+            refetchOnMount: "always",
+            retry: 3,
+            retryDelay: 1000
         },
+        mutations: {
+            onError: handleErrorResponse,
+            retry: 3,
+            retryDelay: 2000
+        }
     });
 
     return (
