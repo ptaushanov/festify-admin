@@ -3,13 +3,18 @@ import DataGrid, {
     Column,
     HeaderFilter,
     Pager,
-    Paging
+    Paging,
+    Toolbar,
+    Item,
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ImageCell from "./components/ImageCell";
 import { CellDblClickEvent } from "devextreme/ui/data_grid";
+import Button from "devextreme-react/button";
+
+import { BookOpenIcon, LightBulbIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
@@ -71,7 +76,8 @@ export default function Timelines() {
                 showBorders
                 keyExpr="id"
                 columnAutoWidth
-                className="card p-4 rounded-md shadow-sm bg-base-100 mt-8"
+                allowColumnResizing
+                className="card p-4 rounded-md shadow-sm bg-base-100 mt-10 w-full"
                 onCellDblClick={handleTimelineLessonChange}
             >
                 <HeaderFilter visible={true} />
@@ -93,8 +99,27 @@ export default function Timelines() {
                     showInfo
                 />
                 <Paging defaultPageSize={5} />
+
+                <Toolbar>
+                    <Item name="groupPanel" />
+                    <Item location="before">
+                        <p className="text-md text-neutral-500 text-[1rem] font-semibold">
+                            Lesson previews
+                        </p>
+                    </Item>
+                    <Item name="addRowButton" showText="always" />
+                    <Item name="exportButton" />
+                    <Item name="columnChooserButton" />
+                    <Item name="searchPanel" />
+                </Toolbar>
             </DataGrid>
 
-        </div>
+            <div className="divider">
+                <div className="flex items-center space-x-2 text-neutral-400">
+                    <LightBulbIcon className="h-4 w-4" />
+                    <p>Tip: Double click a lesson to edit it</p>
+                </div>
+            </div>
+        </div >
     )
 }
