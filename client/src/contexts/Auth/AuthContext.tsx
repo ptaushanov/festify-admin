@@ -14,6 +14,7 @@ interface AuthContextProps {
     isError: boolean;
     error: string | null;
     token: string | null;
+    refreshUserToken: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -47,6 +48,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const setUserToken = async (user: User) => {
         const token = await getIdToken(user);
         setToken(token);
+    }
+
+    const refreshUserToken = async () => {
+        if (!currentUser) throw new Error("User is not logged in")
+        await setUserToken(currentUser);
     }
 
     const signIn = async (email: string, password: string) => {
@@ -100,7 +106,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signOut,
         isError,
         error,
-        token
+        token,
+        refreshUserToken
     };
 
     if (isLoading) return <Loading />

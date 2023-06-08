@@ -11,7 +11,7 @@ interface TRPCProviderProps {
 }
 
 export default function TRPCProvider({ children }: TRPCProviderProps) {
-    const { token } = useAuth();
+    const { token, refreshUserToken } = useAuth();
     const headers = { authorization: token || '' }
 
     const [queryClient] = useState(() => new QueryClient());
@@ -22,6 +22,12 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
             ],
         }),
     );
+
+    queryClient.setDefaultOptions({
+        queries: {
+            onError: refreshUserToken
+        },
+    });
 
     return (
         <trpc.Provider client={trpcClient} queryClient={queryClient} >
