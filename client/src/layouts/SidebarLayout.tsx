@@ -17,7 +17,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     const { signOut } = useAuth();
 
     return (
-        <div className="h-screen overflow-hidden">
+        <div className="h-screen max-h-screen flex flex-1 flex-col">
             <div className="navbar bg-base-100">
                 <div className="flex-1">
                     <Link to="/" className="btn btn-ghost normal-case text-xl">
@@ -44,9 +44,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                     </div>
                 </div>
             </div>
-            <div className="drawer lg:drawer-open">
+            <div className="drawer sm:drawer-open overflow-hidden flex-1">
                 <input type="checkbox" className="drawer-toggle" />
-                <div className="drawer-content flex flex-col p-10 bg-base-200">
+                <div className="drawer-content flex flex-col p-10 bg-base-200 overflow-auto">
                     {children}
                     <Toaster position="bottom-center" toastOptions={{ duration: 3000 }} />
                 </div>
