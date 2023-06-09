@@ -15,22 +15,29 @@ interface LessonEditModalProps {
 }
 
 function LessonEditModal({ modalRef, holiday, season }: LessonEditModalProps) {
-    const [thumbnail, setThumbnail] = useState<string | null>(null)
+    const [thumbnail, setThumbnail] = useState<string | null>(holiday?.thumbnail ?? null)
     const formRef = useRef<HTMLFormElement>(null)
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
     const lessonMutation = trpc.timeline.updateHoliday.useMutation()
+    const trpcContext = trpc.useContext()
 
     const handleEditLesson = () => {
         if (!formRef.current) return
         const formData = new FormData(formRef.current)
         const celebratedOn = formData.get("celebrated_on") as string
+
         lessonMutation.mutate({
             season,
             index: holiday?.id ?? 0,
             holiday: {
                 celebrated_on: celebratedOn,
                 thumbnail: thumbnail ?? undefined,
+            }
+        }, {
+            onSuccess: () => {
+                modalRef.current?.close()
+                trpcContext.timeline.getSeasonTimeline.invalidate({ season })
             }
         })
     }

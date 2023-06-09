@@ -47,6 +47,11 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
         if (isGenericError) toast.error(error.message);
     }
 
+    const handleMutateFeedback = (variables: unknown) => {
+        toast.loading('Saving ...');
+        return variables;
+    }
+
     queryClient.setDefaultOptions({
         queries: {
             onError: handleErrorResponse,
@@ -56,6 +61,7 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
         },
         mutations: {
             onError: handleErrorResponse,
+            onMutate: handleMutateFeedback,
             retry: 3,
             retryDelay: 2000
         }

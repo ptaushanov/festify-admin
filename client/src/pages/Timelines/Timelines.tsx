@@ -115,7 +115,11 @@ export default function Timelines() {
             </div>
 
             {/* Modal */}
-            <LessonEditModal modalRef={modalRef} holiday={selectedHoliday} season={selectedSeason} />
+            <LessonEditModal
+                modalRef={modalRef}
+                holiday={selectedHoliday}
+                season={selectedSeason}
+            />
         </div >
     )
 }
