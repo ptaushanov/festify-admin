@@ -90,6 +90,7 @@ export default function Timelines() {
                     showPageSizeSelector
                     showNavigationButtons
                     showInfo
+                    visible={true}
                 />
                 <Paging defaultPageSize={5} />
 
