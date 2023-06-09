@@ -36,7 +36,8 @@ export const getLessonByIdOutputSchema = z.object({
         choices: z.array(z.string()),
     })),
     reward: z.unknown().optional(),
-    xp_reward: z.number()
+    xp_reward: z.number(),
+    last_for_season: z.boolean().default(false),
 });
 
 export type ViewLessonsInput = z.infer<typeof viewLessonsInputSchema>;
@@ -74,8 +75,9 @@ export const getLessonById = async (season: Season, lessonId: string) => {
 
     const lessonDoc = await getLessonDocById(seasonLessons, lessonId);
     const lessonData = lessonDoc.data()
+    const id = lessonDoc.id
 
-    return lessonData as LessonByIdOutput
+    return { id, ...lessonData } as LessonByIdOutput
 }
 
 async function getLessonDocById(

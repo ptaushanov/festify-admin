@@ -1,4 +1,6 @@
 import Tabs from '../../../components/Tabs/Tabs';
+import trpc from '../../../services/trpc';
+import GeneralTab from './GeneralTab';
 
 interface LessonPreviewProps {
     season: "spring" | "summer" | "autumn" | "winter"
@@ -6,10 +8,26 @@ interface LessonPreviewProps {
 }
 
 function LessonPreview({ season, lessonId }: LessonPreviewProps) {
+    const { data, isLoading, isError } = trpc.lesson.getLessonById
+        .useQuery({ season, lessonId })
+
+    const {
+        holiday_name,
+        xp_reward,
+        last_for_season,
+        content,
+        questions,
+        reward,
+    } = data || {}
+
     const tabs: { tabName: string; tabContent: JSX.Element | null; }[] = [
         {
             tabName: "General",
-            tabContent: null
+            tabContent: <GeneralTab
+                holidayName={holiday_name}
+                xpReward={xp_reward}
+                lastForSeason={last_for_season}
+            />
         },
         {
             tabName: "Pages",
@@ -29,10 +47,9 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         }
     ]
 
-
     return (
         <div>
-            <Tabs tabs={tabs} />
+            <Tabs tabs={tabs} loading={isLoading} error={isError} />
         </div>
     )
 }

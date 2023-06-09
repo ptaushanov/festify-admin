@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Loading from '../Loading/Loading'
 
 type Tab = {
     tabName: string,
@@ -6,10 +7,12 @@ type Tab = {
 }
 
 interface TabsProps {
-    tabs: Tab[]
+    tabs: Tab[],
+    loading?: boolean
+    error?: boolean
 }
 
-function Tabs({ tabs }: TabsProps) {
+function Tabs({ tabs, loading, error }: TabsProps) {
     const [selectedTab, setSelectedTab] = useState<number>(0)
 
     return (
@@ -24,7 +27,19 @@ function Tabs({ tabs }: TabsProps) {
                 </a>
             ))}
             <div className="card p-4 rounded-md shadow-sm bg-base-100 w-full min-h-16">
-                {tabs[selectedTab].tabContent}
+                {
+                    error ? (
+                        <div className="flex justify-center items-center h-24">
+                            <p className="text-lg text-center text-neutral-400">
+                                Error loading data
+                            </p>
+                        </div>
+                    ) : loading ? (
+                        <div className="flex justify-center items-center h-24">
+                            <Loading />
+                        </div>
+                    ) : tabs[selectedTab].tabContent
+                }
             </div>
         </div>
     )
