@@ -1,6 +1,7 @@
 import Tabs from '../../../components/Tabs/Tabs';
 import trpc from '../../../services/trpc';
 import GeneralTab from './GeneralTab';
+import PagesTab from './PagesTab';
 
 interface LessonPreviewProps {
     season: "spring" | "summer" | "autumn" | "winter"
@@ -31,7 +32,10 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         },
         {
             tabName: "Pages",
-            tabContent: null
+            tabContent: <PagesTab
+                pages={content}
+                holidayName={holiday_name}
+            />
         },
         {
             tabName: "Questions",
@@ -40,17 +44,11 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         {
             tabName: "Reward",
             tabContent: null
-        },
-        {
-            tabName: "Timeline preview",
-            tabContent: null
         }
     ]
 
     return (
-        <div>
-            <Tabs tabs={tabs} loading={isLoading} error={isError} />
-        </div>
+        <Tabs tabs={tabs} loading={isLoading} error={isError} />
     )
 }
 

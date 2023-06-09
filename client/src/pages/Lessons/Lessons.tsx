@@ -101,10 +101,7 @@ export default function Timelines() {
             </DataGrid>
 
             {selectedLessonId ? (
-                <div className="mt-4">
-                    <div className="divider mb-6">
-                        <p className="text-neutral-400">Lesson Preview</p>
-                    </div>
+                <div className="mt-6">
                     <LessonPreview lessonId={selectedLessonId} season={selectedSeason} />
                 </div>
             ) : <div className="divider mt-6">
