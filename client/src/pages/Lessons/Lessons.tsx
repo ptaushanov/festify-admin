@@ -9,13 +9,15 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
 import { useRef, useState } from "react";
-import { CellDblClickEvent } from "devextreme/ui/data_grid";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
 export default function Timelines() {
     const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
     const pageSizes = [5, 10, 20]
+
+    const { data } = trpc.lesson.getLessonsBySeason
+        .useQuery({ season: selectedSeason });
 
     const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedSeason(event.target.value as Season);
@@ -40,7 +42,7 @@ export default function Timelines() {
             </div>
 
             <DataGrid
-                dataSource={null}
+                dataSource={data?.lessons}
                 rowAlternationEnabled
                 focusedRowEnabled
                 showBorders
@@ -54,7 +56,6 @@ export default function Timelines() {
                 <Column dataField="holiday_name" dataType="string" />
                 <Column dataField="xp_reward" dataType="number" />
                 <Column dataField="page_count" dataType="number" />
-                <Column dataField="question_count" dataType="number" />
                 <Column dataField="question_count" dataType="number" />
                 <Column dataField="has_reward" dataType="boolean" />
                 <Pager
