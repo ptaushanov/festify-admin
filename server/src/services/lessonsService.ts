@@ -17,8 +17,32 @@ export const viewLessonsOutputSchema = z.object({
     }))
 });
 
+export const getLessonByIdInputSchema = z.object({
+    season: z.enum(["spring", "summer", "autumn", "winter"]),
+    lessonId: z.string(),
+});
+
+export const getLessonByIdOutputSchema = z.object({
+    id: z.string(),
+    holiday_name: z.string(),
+    content: z.record(z.string(), z.array(
+        z.object({
+            type: z.enum(["text", "image"]),
+            value: z.string(),
+        }),
+    )),
+    questions: z.array(z.object({
+        answer: z.number(),
+        choices: z.array(z.string()),
+    })),
+    reward: z.unknown().optional(),
+    xp_reward: z.number()
+});
+
 export type ViewLessonsInput = z.infer<typeof viewLessonsInputSchema>;
 export type ViewLessonsOutput = z.infer<typeof viewLessonsOutputSchema>;
+export type LessonByIdInput = z.infer<typeof getLessonByIdInputSchema>;
+export type LessonByIdOutput = z.infer<typeof getLessonByIdOutputSchema>;
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 
 export const getLessonsBySeason = async (season: Season) => {
@@ -42,4 +66,28 @@ export const getLessonsBySeason = async (season: Season) => {
     })
 
     return { lessons }
+
+}
+export const getLessonById = async (season: Season, lessonId: string) => {
+    const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
+    const seasonLessons = seasonDoc.collection("lessons")
+
+    const lessonDoc = await getLessonDocById(seasonLessons, lessonId);
+    const lessonData = lessonDoc.data()
+
+    return lessonData as LessonByIdOutput
+}
+
+async function getLessonDocById(
+    seasonLessons: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>,
+    lessonId: string
+) {
+    const lessonDoc = await seasonLessons.doc(lessonId).get();
+    if (!lessonDoc.exists) {
+        throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Lesson not found",
+        });
+    }
+    return lessonDoc;
 }

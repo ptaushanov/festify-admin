@@ -1,5 +1,8 @@
 import { router } from '../trpc.js';
 import {
+    getLessonById,
+    getLessonByIdInputSchema,
+    getLessonByIdOutputSchema,
     getLessonsBySeason,
     viewLessonsInputSchema,
     viewLessonsOutputSchema
@@ -11,5 +14,12 @@ export const lessonRouter = router({
         .output(viewLessonsOutputSchema)
         .query(async ({ input: { season } }) => {
             return await getLessonsBySeason(season)
-        })
+        }),
+
+    getLessonById: protectedProcedure
+        .input(getLessonByIdInputSchema)
+        .output(getLessonByIdOutputSchema)
+        .query(async ({ input: { season, lessonId } }) => {
+            return await getLessonById(season, lessonId)
+        }),
 });

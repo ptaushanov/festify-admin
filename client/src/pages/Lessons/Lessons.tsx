@@ -5,15 +5,28 @@ import DataGrid, {
     Pager,
     Paging,
     Toolbar,
-    Item,
+    Item
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { LightBulbIcon } from "@heroicons/react/24/outline";
+import { CellClickEvent } from 'devextreme/ui/data_grid';
+import LessonPreview from "./components/LessonPreview";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
+type LessonInfo = {
+    id: string;
+    holiday_name: string;
+    xp_reward: number;
+    page_count: number;
+    question_count: number;
+    has_reward: boolean;
+}
+
 export default function Timelines() {
     const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
+    const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
     const pageSizes = [5, 10, 20]
 
     const { data } = trpc.lesson.getLessonsBySeason
@@ -21,6 +34,11 @@ export default function Timelines() {
 
     const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedSeason(event.target.value as Season);
+    }
+
+    const handleLessonSelect = (event: CellClickEvent<LessonInfo, any>) => {
+        const { data } = event
+        setSelectedLessonId(data.id)
     }
 
     return (
@@ -50,6 +68,7 @@ export default function Timelines() {
                 columnAutoWidth
                 allowColumnResizing
                 className="card p-4 rounded-md shadow-sm bg-base-100 mt-10 w-full"
+                onCellClick={handleLessonSelect}
             >
                 <HeaderFilter visible={true} />
                 <SearchPanel visible={true} highlightCaseSensitive={true} width={200} />
@@ -80,6 +99,20 @@ export default function Timelines() {
                     <Item name="searchPanel" />
                 </Toolbar>
             </DataGrid>
+
+            {selectedLessonId ? (
+                <div className="mt-4">
+                    <div className="divider mb-6">
+                        <p className="text-neutral-400">Lesson Preview</p>
+                    </div>
+                    <LessonPreview lessonId={selectedLessonId} season={selectedSeason} />
+                </div>
+            ) : <div className="divider mt-6">
+                <div className="flex items-center space-x-2 text-neutral-400">
+                    <LightBulbIcon className="h-4 w-4" />
+                    <p>Tip: Select a lesson to view more information about it</p>
+                </div>
+            </div>}
         </div >
     )
 }

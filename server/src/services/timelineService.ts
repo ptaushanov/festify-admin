@@ -15,7 +15,7 @@ export const timelineOutputSchema = z.object({
             celebrated_on: z.string(),
             name: z.string(),
             thumbnail: z.string(),
-            lessonRef: z.any().optional(),
+            lessonRef: z.unknown().optional(),
         })
     )
 })
