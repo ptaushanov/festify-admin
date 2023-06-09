@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
 import { appRouter } from './routers/appRouter.js';
 import { createContext } from './contexts/context.js';

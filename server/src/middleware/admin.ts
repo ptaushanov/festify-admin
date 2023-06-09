@@ -1,9 +1,9 @@
 import { middleware } from '../trpc.js'
-import { db } from '../firebase-admin.js';
+import { adminDB } from '../firebase-admin.js';
 import { TRPCError } from '@trpc/server';
 
 const verifyUserIsAdmin = async (uid: string) => {
-    const adminCollection = db.collection('admins')
+    const adminCollection = adminDB.collection('admins')
     try {
         const adminDoc = await adminCollection.doc(uid).get()
         return adminDoc.exists

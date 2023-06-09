@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { AppRouter } from '../../../../server/src/routers/appRouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TRPCClientError, httpBatchLink } from '@trpc/client';
@@ -25,6 +25,10 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
         }),
     );
 
+    useEffect(() => {
+        console.log('Token changed! Token: ', token);
+    })
+
     const handleTRPCClientError = async (error: TRPCClientError<AppRouter>) => {
         toast.error(error.message);
 
@@ -33,10 +37,9 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
 
         toast.loading('Refreshing user credentials');
         await refreshUserToken();
-        toast.success('Credentials refreshed!');
     }
 
-    const handleErrorResponse = (error: unknown) => {
+    const handleErrorResponse = (error: unknown): Promise<void> | void => {
         const isTRPCClientError = error instanceof TRPCClientError<AppRouter>
         if (isTRPCClientError) return handleTRPCClientError(error)
 
