@@ -1,14 +1,18 @@
 import { router } from '../trpc.js';
 import {
-    createLessonInputSchema,
     getLessonById,
     getLessonByIdInputSchema,
     getLessonByIdOutputSchema,
     getLessonsBySeason,
     viewLessonsInputSchema,
     viewLessonsOutputSchema
-} from '../services/lessonsService.js';
-import { createLesson } from '../services/lessonsService.js';
+} from '../services/lessonsQueryService.js';
+
+import {
+    createLesson,
+    createLessonInputSchema
+} from '../services/lessonsCreateService.js';
+
 import protectedProcedure from '../procedures/protectedProcedure.js';
 
 export const lessonRouter = router({
