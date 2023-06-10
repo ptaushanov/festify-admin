@@ -61,7 +61,7 @@ export const updateHoliday = async (season: Season, index: number, holiday: Holi
     let downloadURL = oldThumbnailURL
     if (thumbnail && oldThumbnailURL) {
         await deleteOldThumbnail(oldThumbnailURL);
-        downloadURL = await createDownloadUrl(season, thumbnail, downloadURL);
+        downloadURL = await createDownloadUrl(season, thumbnail);
     }
 
     // Update the holiday data inside the timeline
@@ -112,13 +112,12 @@ function updateHolidayData(
     return updatedHoliday;
 }
 
-async function createDownloadUrl(season: Season, thumbnail: string, downloadURL: string) {
+export async function createDownloadUrl(season: Season, thumbnail: string) {
     const uploadPath = `images/lessons/${season}/${randomUUID()}}`;
     const uploadRef = ref(clientStorage, uploadPath);
 
     const uploadTask = await uploadString(uploadRef, thumbnail, 'data_url');
-    downloadURL = await getDownloadURL(uploadTask.ref);
-    return downloadURL;
+    return await getDownloadURL(uploadTask.ref);
 }
 
 async function deleteOldThumbnail(oldThumbnail: string) {
@@ -137,7 +136,7 @@ async function deleteOldThumbnail(oldThumbnail: string) {
     }
 }
 
-async function findTimelineDoc(season: string) {
+export async function findTimelineDoc(season: string) {
     let timelineDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>;
     try {
         timelineDoc = await adminDB.collection('seasons_timeline')
@@ -152,7 +151,7 @@ async function findTimelineDoc(season: string) {
     return timelineDoc;
 }
 
-function checkDocExists(
+export function checkDocExists(
     timelineDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>
 ) {
     if (!timelineDoc.exists) {
