@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { adminDB } from "../firebase-admin.js";
 import { TRPCError } from "@trpc/server";
-import { firestore } from "firebase-admin";
-import { checkDocExists, createDownloadUrl, findTimelineDoc } from "./timelineService.js";
+import admin from "firebase-admin";
+import { createDownloadUrl } from "./timelineService.js";
 
 export const viewLessonsInputSchema = z.object({
     season: z.enum(["spring", "summer", "autumn", "winter"]),
@@ -113,30 +113,33 @@ export const createLesson = async (season: Season, lesson: CreateLessonInput['le
     const seasonLessons = seasonDoc.collection("lessons")
     const lessonDoc = await addNewLesson(seasonLessons, lesson)
 
-    const timelineDoc = await findTimelineDoc(season)
-    checkDocExists(timelineDoc)
+    const { celebrated_on, thumbnail, holiday_name } = lesson;
+    const newHoliday = {
+        celebrated_on,
+        name: holiday_name,
+        thumbnail: await createDownloadUrl(season, thumbnail),
+        lessonRef: lessonDoc
+    };
 
-    const newHoliday = await createNewHoliday(lesson, season)
-    await updateHolidays(lessonDoc, newHoliday);
-
+    await updateHolidays(season, newHoliday);
     return { message: 'Lesson was created successfully' }
 }
 
 async function updateHolidays(
-    lessonDoc: firestore.DocumentReference<firestore.DocumentData>,
+    season: Season,
     newHoliday: { celebrated_on: string; thumbnail: string; }
 ) {
-    await lessonDoc.update({
-        holidays: firestore.FieldValue.arrayUnion(newHoliday),
-    });
-}
-
-async function createNewHoliday(lesson: CreateLessonInput['lesson'], season: Season) {
-    const { celebrated_on, thumbnail } = lesson;
-    return {
-        celebrated_on,
-        thumbnail: await createDownloadUrl(season, thumbnail),
-    };
+    const timelineDoc = adminDB.collection('seasons_timeline').doc(season)
+    try {
+        await timelineDoc.update({
+            holidays: admin.firestore.FieldValue.arrayUnion(newHoliday),
+        });
+    } catch (error) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update holidays in timeline",
+        });
+    }
 }
 
 async function addNewLesson(

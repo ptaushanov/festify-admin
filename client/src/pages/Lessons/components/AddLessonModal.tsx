@@ -11,8 +11,8 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
     const formRef = useRef<HTMLFormElement>(null)
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
-    // const lessonMutation = trpc.timeline.updateHoliday.useMutation()
-    // const trpcContext = trpc.useContext()
+    const lessonMutation = trpc.lesson.createLesson.useMutation()
+    const trpcContext = trpc.useContext()
 
     const handleResetForm = () => {
         formRef.current?.reset()
@@ -25,10 +25,24 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
         const formData = new FormData(formRef.current)
         const celebratedOn = formData.get("celebrated_on") as string
         const holidayName = formData.get("holiday_name") as string
-        const xpReward = formData.get("xp_reward") as string
+        const xpReward = +(formData.get("xp_reward") as string)
         const lastForSeason = !!formData.get("last_for_season")
 
-        console.log(celebratedOn, holidayName, xpReward, lastForSeason)
+        lessonMutation.mutate({
+            season,
+            lesson: {
+                thumbnail: thumbnail ?? '',
+                celebrated_on: celebratedOn,
+                holiday_name: holidayName,
+                xp_reward: xpReward,
+                last_for_season: lastForSeason
+            }
+        }, {
+            onSuccess: () => {
+                modalRef.current?.close()
+                trpcContext.lesson.getLessonsBySeason.invalidate({ season })
+            }
+        })
     }
 
     const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {

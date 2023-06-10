@@ -1,5 +1,6 @@
 import { router } from '../trpc.js';
 import {
+    createLessonInputSchema,
     getLessonById,
     getLessonByIdInputSchema,
     getLessonByIdOutputSchema,
@@ -7,7 +8,9 @@ import {
     viewLessonsInputSchema,
     viewLessonsOutputSchema
 } from '../services/lessonsService.js';
+import { createLesson } from '../services/lessonsService.js';
 import protectedProcedure from '../procedures/protectedProcedure.js';
+
 export const lessonRouter = router({
     getLessonsBySeason: protectedProcedure
         .input(viewLessonsInputSchema)
@@ -22,4 +25,10 @@ export const lessonRouter = router({
         .query(async ({ input: { season, lessonId } }) => {
             return await getLessonById(season, lessonId)
         }),
+
+    createLesson: protectedProcedure
+        .input(createLessonInputSchema)
+        .mutation(async ({ input: { season, lesson } }) => {
+            return await createLesson(season, lesson)
+        })
 });
