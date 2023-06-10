@@ -1,6 +1,7 @@
 import { ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { useNavigate, useParams } from "react-router-dom"
 import LessonPreview from "./components/LessonPreview"
+import trpc from "../../services/trpc"
 type Season = "spring" | "summer" | "autumn" | "winter"
 
 function Preview() {
@@ -9,6 +10,25 @@ function Preview() {
     const hasNeededParams = season && id
     const isSeasonValid = !!season &&
         ["spring", "summer", "autumn", "winter"].includes(season)
+
+    const deleteMutation = trpc.lesson.deleteLessonById.useMutation()
+    const trpcContext = trpc.useContext()
+
+    const handleDeleteLesson = () => {
+        if (!isSeasonValid || !id) return
+        const castedSeason = season as Season
+
+        deleteMutation.mutate({
+            season: castedSeason,
+            lessonId: id
+        }, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonsBySeason
+                    .invalidate({ season: castedSeason })
+                navigate(-1)
+            }
+        })
+    }
 
     return (
         <div className="flex flex-col">
@@ -25,9 +45,14 @@ function Preview() {
                 <h1 className="text-3xl font-bold">
                     Lesson Preview
                 </h1>
-                <button className="btn bg-base-100 border-base-300 hover:btn-error rounded">
-                    <TrashIcon className="w-4 h-4" />
-                </button>
+                {hasNeededParams && isSeasonValid ?
+                    <button
+                        onClick={handleDeleteLesson}
+                        className="btn bg-base-100 border-base-300 hover:btn-error rounded"
+                    >
+                        <TrashIcon className="w-4 h-4" />
+                    </button> : <div />
+                }
             </div>
             {hasNeededParams && isSeasonValid ?
                 <LessonPreview lessonId={id} season={season as Season} /> :
