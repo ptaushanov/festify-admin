@@ -14,8 +14,10 @@ interface PageContentProps {
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
     onContentChange: (pageId: string, id: number, newValue: string) => void;
     onCreateContentBlock: (pageId: string, type: "image" | "text") => void;
+    onDeleteContentBlock: (pageId: string, id: number) => void;
     onCreatePage: () => void;
     onDeletePage: (pageId: string) => void;
+    onSavePages: () => void;
 }
 
 function PageContent({
@@ -26,8 +28,10 @@ function PageContent({
     setEditMode,
     onContentChange,
     onCreateContentBlock,
+    onDeleteContentBlock,
     onCreatePage,
-    onDeletePage
+    onDeletePage,
+    onSavePages
 }: PageContentProps) {
     const modalRef = useRef<HTMLDialogElement>(null)
 
@@ -55,6 +59,7 @@ function PageContent({
                         value={value}
                         editMode={isEditMode}
                         onContentChange={onContentChange}
+                        onDelete={onDeleteContentBlock}
                     />
                 ))}
             </div>
@@ -79,7 +84,9 @@ function PageContent({
                                 className="btn btn-circle mr-2">
                                 <PlusIcon className="h-5 w-5" />
                             </button>
-                            <button className="btn btn-neutral">Save</button>
+                            <button className="btn btn-neutral" onClick={onSavePages}>
+                                Save
+                            </button>
                         </>
                     )}
                     <button className="btn"

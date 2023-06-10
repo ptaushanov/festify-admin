@@ -6,10 +6,20 @@ interface ContentBlockProps {
     type: "text" | "image";
     value: string;
     editMode: boolean;
+    onDelete: (pageId: string, id: number) => void;
     onContentChange: (pageId: string, id: number, newValue: string) => void;
 }
 
-function ContentBlock({ pageId, id, type, value, onContentChange, editMode }: ContentBlockProps) {
+function ContentBlock({
+    pageId,
+    id,
+    type,
+    value,
+    editMode,
+    onDelete,
+    onContentChange,
+}: ContentBlockProps
+) {
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
     const handleContentChange =
@@ -32,11 +42,13 @@ function ContentBlock({ pageId, id, type, value, onContentChange, editMode }: Co
         });
     }
 
+    const handleDelete = () => onDelete(pageId, id)
+
     return (
         <div>
             {type === "text" ? (
                 editMode ? (
-                    <div className="join flex items-stretch">
+                    <div className="join flex">
                         <div className="collapse bg-base-200 rounded-md join-item">
                             <input type="radio" name="my-accordion-1" />
                             <div className="collapse-title text-sm pt-5 font-semibold">
@@ -50,7 +62,10 @@ function ContentBlock({ pageId, id, type, value, onContentChange, editMode }: Co
                                 />
                             </div>
                         </div>
-                        <button className="btn bg-base-300 hover:btn-error join-item h-auto">
+                        <button
+                            onClick={handleDelete}
+                            className="btn bg-base-300 hover:btn-error join-item h-auto"
+                        >
                             <TrashIcon className="h-4 w-4" />
                         </button>
                     </div>
@@ -58,24 +73,32 @@ function ContentBlock({ pageId, id, type, value, onContentChange, editMode }: Co
                     <p className="text-justify">{value}</p>
                 )
             ) : (
-                <div className="bg-base-100 flex justify-center">
+                <div className="bg-base-100 flex w-full">
                     {editMode ? (
-                        <div className="form-control w-full bg-neutral-100 rounded-md py-2 px-4">
-                            <label className="label">
-                                <span className="label-text font-semibold">
-                                    Image (max 5MB)
-                                </span>
-                                <span className="label-text-alt">
-                                    {allowedExtensions.join(", ")}
-                                </span>
-                            </label>
-                            <input
-                                type="file"
-                                name="thumbnail"
-                                accept={allowedExtensions.join(", ")}
-                                onChange={handleImageContentChange}
-                                className="file-input file-input-bordered w-full"
-                            />
+                        <div className="join flex flex-1">
+                            <div className="form-control bg-neutral-100 rounded-md py-2 px-4 w-full join-item">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        Image (max 5MB)
+                                    </span>
+                                    <span className="label-text-alt">
+                                        {allowedExtensions.join(", ")}
+                                    </span>
+                                </label>
+                                <input
+                                    type="file"
+                                    name="thumbnail"
+                                    accept={allowedExtensions.join(", ")}
+                                    onChange={handleImageContentChange}
+                                    className="file-input file-input-bordered w-full"
+                                />
+                            </div>
+                            <button
+                                onClick={handleDelete}
+                                className="btn bg-base-300 hover:btn-error join-item h-auto"
+                            >
+                                <TrashIcon className="h-4 w-4" />
+                            </button>
                         </div>
                     ) : (
                         <img src={value} className="rounded-md w-full h-64 object-cover" />
