@@ -8,10 +8,11 @@ import DataGrid, {
     Item
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LightBulbIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { CellDblClickEvent } from 'devextreme/ui/data_grid';
 import { useNavigate } from "react-router-dom";
+import AddLessonModal from "./components/AddLessonModal";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
@@ -26,6 +27,7 @@ type LessonInfo = {
 
 export default function Lessons() {
     const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
+    const addLessonModalRef = useRef<HTMLDialogElement>(null)
     const navigate = useNavigate()
     const pageSizes = [5, 10, 20]
 
@@ -41,6 +43,7 @@ export default function Lessons() {
         if (data) navigate(`/lessons/${selectedSeason}/${data.id}`)
     }
 
+    const handleOpenAddLessonModal = () => addLessonModalRef.current?.showModal()
     const formatToXP = ({ value }: { value: number }) => `${value} XP`
 
     return (
@@ -50,7 +53,10 @@ export default function Lessons() {
                     Lessons
                 </h1>
                 <div className="flex space-x-2">
-                    <button className="btn bg-base-100 border-base-300">
+                    <button
+                        onClick={handleOpenAddLessonModal}
+                        className="btn bg-base-100 border-base-300"
+                    >
                         <PlusIcon className="h-4 w-4" />
                     </button>
                     <select
@@ -113,6 +119,8 @@ export default function Lessons() {
                     <p>Tip: Double click a lesson to preview it</p>
                 </div>
             </div>
+
+            <AddLessonModal modalRef={addLessonModalRef} season={selectedSeason} />
         </div >
     )
 }

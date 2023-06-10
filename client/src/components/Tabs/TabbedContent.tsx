@@ -15,7 +15,7 @@ function Tabs({ tabs, tabPrefix }: TabsProps) {
                     <a
                         key={index}
                         className={`tab tab-md w-8 h-8
-                            ${selectedTab === index ? "bg-neutral-700 text-base-100 font-semibold" : ""}
+                            ${selectedTab === index ? "bg-neutral text-neutral-content font-semibold" : ""}
                          `}
                         onClick={() => setSelectedTab(index)}
                     >

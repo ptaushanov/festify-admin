@@ -22,7 +22,7 @@ function Tabs({ tabs, loading, error }: TabsProps) {
                     <a
                         key={index}
                         className={`tab tab-lg text-sm  
-                            ${selectedTab === index ? "font-semibold bg-neutral-700 text-base-100" : ""}
+                            ${selectedTab === index ? "font-semibold bg-neutral text-neutral-content" : ""}
                         `}
                         onClick={() => setSelectedTab(index)}
                     >
