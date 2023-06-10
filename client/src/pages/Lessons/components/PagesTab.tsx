@@ -73,7 +73,7 @@ function PagesTab({ pages, holidayName = "" }: PagesTabProps) {
     })
 
     return (
-        <div className="py-2 px-4 flex flex-col space-y-2">
+        <div className="py-2 px-6 flex flex-col space-y-2">
             <TabbedContent tabs={pageElements} />
         </div>
     )

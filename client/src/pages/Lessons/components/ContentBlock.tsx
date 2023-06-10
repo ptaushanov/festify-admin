@@ -19,17 +19,18 @@ function ContentBlock({ id, type, value, onContentChange, editMode }: ContentBlo
         <div>
             {type === "text" ? (
                 editMode ? (
-                    <div className="bg-neutral-100 rounded-md py-2 px-4">
-                        <label className="label">
-                            <span className="label-text font-semibold">
-                                Text Block
-                            </span>
-                        </label>
-                        <textarea
-                            className="textarea textarea-bordered w-full h-36"
-                            value={value}
-                            onChange={handleContentChange}
-                        />
+                    <div className="collapse bg-base-200 rounded-md">
+                        <input type="radio" name="my-accordion-1" />
+                        <div className="collapse-title text-sm pt-5 font-semibold">
+                            Text Block
+                        </div>
+                        <div className="collapse-content">
+                            <textarea
+                                className="textarea textarea-bordered w-full h-36 leading-normal"
+                                value={value}
+                                onChange={handleContentChange}
+                            />
+                        </div>
                     </div>
                 ) : (
                     <p className="text-justify">{value}</p>

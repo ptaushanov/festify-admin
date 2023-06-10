@@ -46,7 +46,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             </div>
             <div className="drawer sm:drawer-open overflow-hidden flex-1">
                 <input type="checkbox" className="drawer-toggle" />
-                <div className="drawer-content flex flex-col p-10 bg-base-200 overflow-auto">
+                <div className="drawer-content flex flex-col p-12 bg-base-200 overflow-auto">
                     {children}
                     <Toaster position="bottom-center" toastOptions={{ duration: 3000 }} />
                 </div>

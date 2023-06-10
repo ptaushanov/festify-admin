@@ -20,7 +20,7 @@ function Tabs({ tabs, loading, error }: TabsProps) {
             {tabs.map(({ tabName }, index) => (
                 <a
                     key={index}
-                    className={`tab tab-lg tab-lifted ${selectedTab === index ? "tab-active" : ""}`}
+                    className={`tab tab-lg text-sm tab-lifted ${selectedTab === index ? "tab-active font-semibold" : ""}`}
                     onClick={() => setSelectedTab(index)}
                 >
                     {tabName}

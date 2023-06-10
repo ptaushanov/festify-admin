@@ -70,7 +70,7 @@ export default function Timelines() {
                 keyExpr="id"
                 columnAutoWidth
                 allowColumnResizing
-                className="card p-4 rounded-md shadow-sm bg-base-100 mt-10 w-full"
+                className="card p-8 rounded-md shadow-sm bg-base-100 mt-10 w-full"
                 onCellDblClick={handleTimelineLessonChange}
             >
                 <HeaderFilter visible={true} />
@@ -97,7 +97,7 @@ export default function Timelines() {
                 <Toolbar>
                     <Item name="groupPanel" />
                     <Item location="before">
-                        <p className="text-md text-neutral-500 text-[1rem] font-semibold">
+                        <p className="text-md text-neutral-500 text-lg font-semibold">
                             Lesson previews
                         </p>
                     </Item>

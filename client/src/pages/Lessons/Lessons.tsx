@@ -10,7 +10,7 @@ import DataGrid, {
 import trpc from "../../services/trpc";
 import { useState } from "react";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
-import { CellClickEvent } from 'devextreme/ui/data_grid';
+import { CellDblClickEvent } from 'devextreme/ui/data_grid';
 import LessonPreview from "./components/LessonPreview";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
@@ -36,7 +36,7 @@ export default function Timelines() {
         setSelectedSeason(event.target.value as Season);
     }
 
-    const handleLessonSelect = (event: CellClickEvent<LessonInfo, any>) => {
+    const handleLessonSelect = (event: CellDblClickEvent<LessonInfo, unknown>) => {
         const { data } = event
         setSelectedLessonId(data.id)
     }
@@ -67,8 +67,8 @@ export default function Timelines() {
                 keyExpr="id"
                 columnAutoWidth
                 allowColumnResizing
-                className="card p-4 rounded-md shadow-sm bg-base-100 mt-10 w-full"
-                onCellClick={handleLessonSelect}
+                className="card p-8 rounded-md shadow-sm bg-base-100 mt-10 w-full"
+                onCellDblClick={handleLessonSelect}
             >
                 <HeaderFilter visible={true} />
                 <SearchPanel visible={true} highlightCaseSensitive={true} width={200} />
@@ -89,7 +89,7 @@ export default function Timelines() {
                 <Toolbar>
                     <Item name="groupPanel" />
                     <Item location="before">
-                        <p className="text-md text-neutral-500 text-[1rem] font-semibold">
+                        <p className="text-md text-neutral-500 text-lg font-semibold">
                             Lesson previews
                         </p>
                     </Item>
