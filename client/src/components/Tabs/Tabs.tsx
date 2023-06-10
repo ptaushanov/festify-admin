@@ -16,16 +16,20 @@ function Tabs({ tabs, loading, error }: TabsProps) {
     const [selectedTab, setSelectedTab] = useState<number>(0)
 
     return (
-        <div className="tabs justify-center">
-            {tabs.map(({ tabName }, index) => (
-                <a
-                    key={index}
-                    className={`tab tab-lg text-sm tab-lifted ${selectedTab === index ? "tab-active font-semibold" : ""}`}
-                    onClick={() => setSelectedTab(index)}
-                >
-                    {tabName}
-                </a>
-            ))}
+        <div className="flex flex-col space-y-6">
+            <div className="tabs tabs-boxed bg-base-100 p-2 rounded-md shadow-sm">
+                {tabs.map(({ tabName }, index) => (
+                    <a
+                        key={index}
+                        className={`tab tab-lg text-sm  
+                            ${selectedTab === index ? "font-semibold bg-neutral-700 text-base-100" : ""}
+                        `}
+                        onClick={() => setSelectedTab(index)}
+                    >
+                        {tabName}
+                    </a>
+                ))}
+            </div>
             <div className="card p-4 rounded-md shadow-sm bg-base-100 w-full min-h-16">
                 {
                     error ? (

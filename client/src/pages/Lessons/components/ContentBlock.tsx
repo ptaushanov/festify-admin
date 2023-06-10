@@ -1,3 +1,5 @@
+import { TrashIcon } from "@heroicons/react/24/outline";
+
 interface ContentBlockProps {
     id: number;
     type: "text" | "image";
@@ -19,18 +21,23 @@ function ContentBlock({ id, type, value, onContentChange, editMode }: ContentBlo
         <div>
             {type === "text" ? (
                 editMode ? (
-                    <div className="collapse bg-base-200 rounded-md">
-                        <input type="radio" name="my-accordion-1" />
-                        <div className="collapse-title text-sm pt-5 font-semibold">
-                            Text Block
+                    <div className="join flex items-stretch">
+                        <div className="collapse bg-base-200 rounded-md join-item">
+                            <input type="radio" name="my-accordion-1" />
+                            <div className="collapse-title text-sm pt-5 font-semibold">
+                                Text Block
+                            </div>
+                            <div className="collapse-content">
+                                <textarea
+                                    className="textarea textarea-bordered w-full h-36 leading-normal"
+                                    value={value}
+                                    onChange={handleContentChange}
+                                />
+                            </div>
                         </div>
-                        <div className="collapse-content">
-                            <textarea
-                                className="textarea textarea-bordered w-full h-36 leading-normal"
-                                value={value}
-                                onChange={handleContentChange}
-                            />
-                        </div>
+                        <button className="btn bg-base-300 hover:btn-error join-item h-auto">
+                            <TrashIcon className="h-4 w-4" />
+                        </button>
                     </div>
                 ) : (
                     <p className="text-justify">{value}</p>

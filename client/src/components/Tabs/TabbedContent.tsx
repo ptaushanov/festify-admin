@@ -14,7 +14,9 @@ function Tabs({ tabs, tabPrefix }: TabsProps) {
                 {tabs?.map((_, index) => (
                     <a
                         key={index}
-                        className={`tab tab-md ${selectedTab === index ? "tab-active" : ""}`}
+                        className={`tab tab-md w-8 h-8
+                            ${selectedTab === index ? "bg-neutral-700 text-base-100 font-semibold" : ""}
+                         `}
                         onClick={() => setSelectedTab(index)}
                     >
                         {tabPrefix} {index + 1}

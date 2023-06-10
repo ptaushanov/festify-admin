@@ -48,7 +48,9 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
     ]
 
     return (
-        <Tabs tabs={tabs} loading={isLoading} error={isError} />
+        <div className="mt-6">
+            <Tabs tabs={tabs} loading={isLoading} error={isError} />
+        </div>
     )
 }
 

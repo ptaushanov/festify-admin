@@ -48,7 +48,7 @@ function PagesTab({ pages, holidayName = "" }: PagesTabProps) {
                                 Delete
                             </button>
                             <button className="btn btn-neutral">
-                                Add New
+                                Add Page
                             </button>
                         </>)}
                     </div>

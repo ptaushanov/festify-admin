@@ -68,6 +68,10 @@ const Lessons = lazy(() => import("./pages/Lessons/Lessons"))
 const LessonsWithLayout = withLayout(SidebarLayout, Lessons)
 const LessonsWithPrivateRoute = withPrivateRoute(LessonsWithLayout)
 
+const LessonPreview = lazy(() => import("./pages/Lessons/Preview"))
+const LessonPreviewWithLayout = withLayout(SidebarLayout, LessonPreview)
+const LessonPreviewWithPrivateRoute = withPrivateRoute(LessonPreviewWithLayout)
+
 const Rewards = lazy(() => import("./pages/Rewards/Rewards"))
 const RewardsWithLayout = withLayout(SidebarLayout, Rewards)
 const RewardsWithPrivateRoute = withPrivateRoute(RewardsWithLayout)
@@ -96,6 +100,10 @@ export default function Routes() {
             <Route
                 path="/lessons"
                 element={<LessonsWithPrivateRoute />}
+            />
+            <Route
+                path="/lessons/:season/:id"
+                element={<LessonPreviewWithPrivateRoute />}
             />
             <Route
                 path="/timelines"
