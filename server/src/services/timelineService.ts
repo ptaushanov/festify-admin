@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { adminDB } from '../firebase-admin.js';
 import { TRPCError } from '@trpc/server';
 import { clientStorage } from '../firebase-client.js';
-import { deleteObject, ref, uploadString, getDownloadURL } from "firebase/storage"
+import { ref, uploadString, getDownloadURL } from "firebase/storage"
 import { randomUUID } from 'crypto';
+import { deleteImage } from '../utils/deleteImage.js';
 
 export const timelineInputSchema = z.object({
     season: z.enum(['spring', 'summer', 'autumn', 'winter']),
@@ -60,7 +61,7 @@ export const updateHoliday = async (season: Season, index: number, holiday: Holi
     // If a new thumbnail is provided, delete the old one
     let downloadURL = oldThumbnailURL
     if (thumbnail && oldThumbnailURL) {
-        await deleteOldThumbnail(oldThumbnailURL);
+        await deleteImage(oldThumbnailURL);
         downloadURL = await createDownloadUrl(season, thumbnail);
     }
 
@@ -118,22 +119,6 @@ export async function createDownloadUrl(season: Season, thumbnail: string) {
 
     const uploadTask = await uploadString(uploadRef, thumbnail, 'data_url');
     return await getDownloadURL(uploadTask.ref);
-}
-
-async function deleteOldThumbnail(oldThumbnail: string) {
-    try {
-        const thumbnailRef = ref(clientStorage, oldThumbnail);
-        await deleteObject(thumbnailRef);
-    } catch (error) {
-        if (error instanceof Error && "code" in error) {
-            if (error.code !== 'storage/object-not-found') {
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                    message: 'Failed to delete old thumbnail',
-                });
-            }
-        }
-    }
 }
 
 export async function findTimelineDoc(season: string) {
