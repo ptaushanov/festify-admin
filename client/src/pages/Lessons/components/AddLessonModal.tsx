@@ -1,49 +1,59 @@
-import { RefObject, useRef, useState } from 'react'
+import { RefObject } from 'react'
 import trpc from '../../../services/trpc';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface AddLessonModalProps {
     modalRef: RefObject<HTMLDialogElement>
     season: "spring" | "summer" | "autumn" | "winter";
 }
 
+const createLessonSchema = z.object({
+    celebrated_on: z.string()
+        .nonempty(),
+    holiday_name: z.string()
+        .nonempty(),
+    xp_reward: z.number()
+        .int()
+        .min(0)
+        .max(1000),
+    last_for_season: z.boolean(),
+    thumbnail: z.string()
+        .nonempty(),
+});
+
+type LessonCreationType = z.infer<typeof createLessonSchema>;
+
 function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
-    const [thumbnail, setThumbnail] = useState<string | null>(null)
-    const formRef = useRef<HTMLFormElement>(null)
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
     const lessonMutation = trpc.lesson.createLesson.useMutation()
     const trpcContext = trpc.useContext()
 
-    const handleResetForm = () => {
-        formRef.current?.reset()
-        setThumbnail(null)
+    const {
+        register, reset, setValue, watch,
+        handleSubmit,
+        formState: { errors }
+    } = useForm<LessonCreationType>({
+        resolver: zodResolver(createLessonSchema),
+    });
+
+
+    const handleModalClose = () => {
+        reset()
+        modalRef.current?.close()
     }
 
-
-    const handleAddLesson = () => {
-        if (!formRef.current) return
-        const formData = new FormData(formRef.current)
-        const celebratedOn = formData.get("celebrated_on") as string
-        const holidayName = formData.get("holiday_name") as string
-        const xpReward = +(formData.get("xp_reward") as string)
-        const lastForSeason = !!formData.get("last_for_season")
-
-        lessonMutation.mutate({
-            season,
-            lesson: {
-                thumbnail: thumbnail ?? '',
-                celebrated_on: celebratedOn,
-                holiday_name: holidayName,
-                xp_reward: xpReward,
-                last_for_season: lastForSeason
-            }
-        }, {
+    const thumbnail = watch("thumbnail")
+    const onSubmit = async (lesson: LessonCreationType) => {
+        lessonMutation.mutate({ season, lesson }, {
             onSuccess: () => {
                 modalRef.current?.close()
                 trpcContext.lesson.getLessonsBySeason.invalidate({ season })
             }
         })
-    }
+    };
 
     const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const thumbnail = event.target.files?.[0]
@@ -54,14 +64,14 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
         fileReader.addEventListener('load', () => {
             const result = fileReader.result
             if (typeof result === 'string' && result.startsWith('data:image')) {
-                setThumbnail(result)
+                setValue("thumbnail", result)
             }
         });
     }
 
     return (
         <dialog className="modal" ref={modalRef}>
-            <form className="modal-box max-w-4xl w-auto" ref={formRef}>
+            <form className="modal-box max-w-4xl w-auto" onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex items-stretch space-x-2 pt-4 px-4">
                     <div className="flex flex-col flex-1">
                         <h3 className="font-bold text-xl">
@@ -76,9 +86,14 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                                 </label>
                                 <input
                                     type="text"
-                                    name="celebrated_on"
                                     className="input input-bordered w-full"
+                                    {...register("celebrated_on")}
                                 />
+                                <label className={`label ${!errors.celebrated_on ? 'hidden' : ''}`}>
+                                    <span className="label-text-alt text-error font-semibold">
+                                        {errors.celebrated_on?.message}
+                                    </span>
+                                </label>
                             </div>
                             <div className="form-control w-full">
                                 <label className="label">
@@ -88,9 +103,14 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                                 </label>
                                 <input
                                     type="text"
-                                    name="holiday_name"
                                     className="input input-bordered w-full"
+                                    {...register("holiday_name")}
                                 />
+                                <label className={`label ${!errors.holiday_name ? 'hidden' : ''}`}>
+                                    <span className="label-text-alt text-error font-semibold">
+                                        {errors.holiday_name?.message}
+                                    </span>
+                                </label>
                             </div>
                             <div className="form-control w-full">
                                 <label className="label">
@@ -100,9 +120,16 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                                 </label>
                                 <input
                                     type="number"
-                                    name='xp_reward'
+                                    min={0}
+                                    max={1000}
                                     className="input input-bordered w-full"
+                                    {...register("xp_reward", { valueAsNumber: true })}
                                 />
+                                <label className={`label ${!errors.xp_reward ? 'hidden' : ''}`}>
+                                    <span className="label-text-alt text-error font-semibold">
+                                        {errors.xp_reward?.message}
+                                    </span>
+                                </label>
                             </div>
                             <div className="form-control w-full my-2">
                                 <label className="label cursor-pointer flex items-center">
@@ -111,8 +138,8 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                                     </span>
                                     <input
                                         type="checkbox"
-                                        name="last_for_season"
                                         className="toggle"
+                                        {...register("last_for_season")}
                                     />
                                 </label>
                             </div>
@@ -132,11 +159,15 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                                     onChange={handleThumbnailChange}
                                     className="file-input file-input-bordered w-full"
                                 />
-
+                                <label className={`label ${!errors.thumbnail ? 'hidden' : ''}`}>
+                                    <span className="label-text-alt text-error font-semibold">
+                                        {errors.thumbnail?.message}
+                                    </span>
+                                </label>
                             </div>
                         </div>
                     </div>
-                    {thumbnail && <>
+                    {!!thumbnail && <>
                         <div className="divider divider-horizontal"></div>
                         <div className="flex flex-1 justify-center">
                             <div className="avatar w-full">
@@ -148,10 +179,10 @@ function AddLessonModal({ modalRef, season }: AddLessonModalProps) {
                     </>}
                 </div>
                 <div className="modal-action">
-                    <button className="btn btn-neutral" type="button" onClick={handleAddLesson}>
+                    <button className="btn btn-neutral" type="submit">
                         Create
                     </button>
-                    <button className="btn" formMethod="dialog" onClick={handleResetForm}>
+                    <button className="btn" type="button" onClick={handleModalClose}>
                         Close
                     </button>
                 </div>
