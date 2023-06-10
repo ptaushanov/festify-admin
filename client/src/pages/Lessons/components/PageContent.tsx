@@ -12,7 +12,7 @@ interface PageContentProps {
     }[];
     isEditMode: boolean;
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-    onContentChange: (pageId: string, id: number, newValue: string) => void;
+    onContentChange: (pageId: string, id: number, newValue: string, oldValue?: string) => void;
     onCreateContentBlock: (pageId: string, type: "image" | "text") => void;
     onDeleteContentBlock: (pageId: string, id: number) => void;
     onCreatePage: () => void;

@@ -1,4 +1,5 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { useRef } from "react";
 
 interface ContentBlockProps {
     pageId: string;
@@ -7,7 +8,7 @@ interface ContentBlockProps {
     value: string;
     editMode: boolean;
     onDelete: (pageId: string, id: number) => void;
-    onContentChange: (pageId: string, id: number, newValue: string) => void;
+    onContentChange: (pageId: string, id: number, newValue: string, oldValue?: string) => void;
 }
 
 function ContentBlock({
@@ -20,6 +21,7 @@ function ContentBlock({
     onContentChange,
 }: ContentBlockProps
 ) {
+    const staticVersionRef = useRef(value)
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
     const handleContentChange =
@@ -37,7 +39,7 @@ function ContentBlock({
         fileReader.addEventListener('load', () => {
             const dataURL = fileReader.result
             if (typeof dataURL === 'string' && dataURL.startsWith('data:image')) {
-                onContentChange(pageId, id, dataURL)
+                onContentChange(pageId, id, dataURL, staticVersionRef.current)
             }
         });
     }

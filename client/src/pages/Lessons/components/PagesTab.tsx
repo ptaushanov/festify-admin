@@ -1,15 +1,21 @@
 import { useState } from "react";
 import TabbedContent from "../../../components/Tabs/TabbedContent";
-import PageContent from "./PageContent";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import PageContent from "./PageContent";
+
+type ContentBlock = {
+    type: "text" | "image";
+    value: string;
+}
+
+type VersionedContentBlock = ContentBlock & {
+    oldValue?: string;
+}
 
 interface PagesTabProps {
     holidayName?: string;
     pages?: {
-        [x: string]: {
-            type: "text" | "image";
-            value: string;
-        }[]
+        [x: string]: VersionedContentBlock[]
     };
 }
 
@@ -17,9 +23,10 @@ function PagesTab({ pages = {}, holidayName = "" }: PagesTabProps) {
     const [modifiedPages, setModifiedPages] = useState(pages)
     const [isEditing, setIsEditing] = useState<boolean>(false)
 
-    const handleContentChange = (pageId: string, id: number, newValue: string) => {
+    const handleContentChange = (pageId: string, id: number, newValue: string, oldValue?: string) => {
         const newPage = structuredClone(modifiedPages[pageId])
         newPage[id].value = newValue
+        if (oldValue) { newPage[id].oldValue = oldValue }
 
         setModifiedPages({
             ...modifiedPages,
