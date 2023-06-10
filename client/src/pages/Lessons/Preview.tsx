@@ -25,6 +25,8 @@ function Preview() {
             onSuccess: () => {
                 trpcContext.lesson.getLessonsBySeason
                     .invalidate({ season: castedSeason })
+                trpcContext.timeline.getSeasonTimeline
+                    .invalidate({ season: castedSeason })
                 navigate(-1)
             }
         })

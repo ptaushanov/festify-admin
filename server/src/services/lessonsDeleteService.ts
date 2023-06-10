@@ -1,10 +1,15 @@
-import { Season } from "./lessonsQueryService.js";
 import { adminDB } from "../firebase-admin.js";
-import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { Season } from "./lessonsQueryService.js";
 import { Lesson } from "../types/lesson.js";
-import { deleteImage, deleteImages } from "../utils/deleteImage.js";
 import { Reward } from "../types/reward.js";
+import { deleteImage, deleteImages } from "../utils/deleteImage.js";
+import {
+    TimelineOutput,
+    checkDocExists,
+    findTimelineDoc
+} from "./timelineService.js";
+import { z } from "zod";
 
 export const deleteLessonInputSchema = z.object({
     season: z.enum(['spring', 'summer', 'autumn', 'winter']),
@@ -16,12 +21,15 @@ export type DeleteLessonInput = z.infer<typeof deleteLessonInputSchema>;
 export const deleteLesson = async (season: Season, lessonId: string) => {
     const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
     const seasonLessons = seasonDoc.collection("lessons")
-    const lessonDoc = await getLessonData(seasonLessons, lessonId)
+    const lessonRef = seasonLessons.doc(lessonId)
+
+    const lessonDoc = await getLessonData(lessonRef)
     const { content, reward } = lessonDoc.data() as Lesson
 
     const imageURLs = extractImageLinksFromPages(content)
     await deleteImages(imageURLs)
     await deleteRewardData(reward);
+    await deleteTimelineData(season, lessonRef);
 
     await deleteLessonDoc(seasonLessons, lessonId);
     return { message: 'Lesson was deleted successfully' }
@@ -36,7 +44,9 @@ async function deleteRewardData(reward: unknown) {
     await deleteReward(rewardRef);
 }
 
-async function deleteReward(rewardRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) {
+async function deleteReward(
+    rewardRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
+) {
     try {
         await rewardRef.delete();
     } catch (error) {
@@ -47,7 +57,9 @@ async function deleteReward(rewardRef: FirebaseFirestore.DocumentReference<Fireb
     }
 }
 
-async function getRewardDoc(rewardRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) {
+async function getRewardDoc(
+    rewardRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
+) {
     try {
         return await rewardRef.get();
     } catch (error) {
@@ -78,15 +90,43 @@ async function deleteLessonDoc(
 }
 
 async function getLessonData(
-    seasonLessons: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>,
-    lessonId: string
+    lessonRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) {
     try {
-        return await seasonLessons.doc(lessonId).get();
+        return await lessonRef.get();
     } catch (error) {
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed find the lesson",
         });
     }
+}
+
+async function deleteTimelineData(
+    season: string,
+    lessonRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
+) {
+    const timelineDoc = await findTimelineDoc(season);
+    checkDocExists(timelineDoc);
+
+    const { holidays } = timelineDoc.data() as TimelineOutput;
+    const holidayIndex = holidays.findIndex((holiday) => {
+        const holidayLessonRef = holiday.lessonRef as FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>;
+        return holidayLessonRef.id === lessonRef.id
+    });
+
+    if (holidayIndex === -1) return;
+    const { thumbnail } = holidays[holidayIndex];
+    await deleteImage(thumbnail);
+
+    const updatedHolidays = [...holidays];
+    updatedHolidays.splice(holidayIndex, 1);
+    await updateHolidays(timelineDoc, updatedHolidays);
+}
+
+async function updateHolidays(
+    timelineDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>,
+    updatedHolidays: TimelineOutput["holidays"]
+) {
+    await timelineDoc.ref.update({ holidays: updatedHolidays });
 }
