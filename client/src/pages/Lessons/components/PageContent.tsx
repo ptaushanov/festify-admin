@@ -1,6 +1,7 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 import ContentBlock from "./ContentBlock";
-import React from "react";
+import React, { useRef } from "react";
+import ContentModal from "./ContentModal";
 
 interface PageContentProps {
     holidayName: string;
@@ -12,6 +13,7 @@ interface PageContentProps {
     isEditMode: boolean;
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
     onContentChange: (pageId: string, id: number, newValue: string) => void;
+    onCreateContentBlock: (pageId: string, type: "image" | "text") => void;
     onCreatePage: () => void;
     onDeletePage: (pageId: string) => void;
 }
@@ -23,9 +25,21 @@ function PageContent({
     isEditMode,
     setEditMode,
     onContentChange,
+    onCreateContentBlock,
     onCreatePage,
     onDeletePage
 }: PageContentProps) {
+    const modalRef = useRef<HTMLDialogElement>(null)
+
+    const handleCreateContentBlock = (type: "image" | "text") => {
+        onCreateContentBlock(pageId, type)
+        modalRef.current?.close()
+    }
+
+    const handleOpenModal = () => {
+        modalRef.current?.showModal()
+    }
+
     return (
         <div className="flex flex-col space-y-2">
             <h3 className="text-2xl font-bold mb-4">
@@ -61,7 +75,8 @@ function PageContent({
                 <div className="flex items-center space-x-2">
                     {isEditMode && (
                         <>
-                            <button className="btn btn-circle mr-2">
+                            <button onClick={handleOpenModal}
+                                className="btn btn-circle mr-2">
                                 <PlusIcon className="h-5 w-5" />
                             </button>
                             <button className="btn btn-neutral">Save</button>
@@ -69,10 +84,14 @@ function PageContent({
                     )}
                     <button className="btn"
                         onClick={() => setEditMode(!isEditMode)}>
-                        {isEditMode ? "Cancel" : "Edit"}
+                        {isEditMode ? "Close" : "Edit"}
                     </button>
                 </div>
             </div>
+            <ContentModal
+                modalRef={modalRef}
+                onCreateContentBlock={handleCreateContentBlock}
+            />
         </div>
     )
 }

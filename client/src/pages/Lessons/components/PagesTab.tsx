@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import TabbedContent from "../../../components/Tabs/TabbedContent";
 import PageContent from "./PageContent";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -41,6 +41,15 @@ function PagesTab({ pages = {}, holidayName = "" }: PagesTabProps) {
         setModifiedPages(otherPages)
     }
 
+    const handleCreateContentBlock = (pageId: string, type: "image" | "text") => {
+        const newPage = [...modifiedPages[pageId], { type, value: "" }]
+        setModifiedPages({
+            ...modifiedPages,
+            [pageId]: newPage
+        })
+    }
+
+
     const pageElements = Object.entries(modifiedPages)
         .reverse()
         .map(([pageId, pageContent]) => (
@@ -52,6 +61,7 @@ function PagesTab({ pages = {}, holidayName = "" }: PagesTabProps) {
                 isEditMode={isEditing}
                 setEditMode={setIsEditing}
                 onContentChange={handleContentChange}
+                onCreateContentBlock={handleCreateContentBlock}
                 onCreatePage={handleCreatePage}
                 onDeletePage={handleDeletePage}
             />
