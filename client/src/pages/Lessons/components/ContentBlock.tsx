@@ -1,21 +1,36 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface ContentBlockProps {
+    pageId: string;
     id: number;
     type: "text" | "image";
     value: string;
     editMode: boolean;
-    onContentChange: (id: number, newValue: string) => void;
+    onContentChange: (pageId: string, id: number, newValue: string) => void;
 }
 
-function ContentBlock({ id, type, value, onContentChange, editMode }: ContentBlockProps) {
+function ContentBlock({ pageId, id, type, value, onContentChange, editMode }: ContentBlockProps) {
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
     const handleContentChange =
         (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
             const newValue = event.target.value
-            onContentChange(id, newValue)
+            onContentChange(pageId, id, newValue)
         }
+
+    const handleImageContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const thumbnail = event.target.files?.[0]
+        if (!thumbnail) return
+
+        const fileReader = new FileReader()
+        fileReader.readAsDataURL(thumbnail)
+        fileReader.addEventListener('load', () => {
+            const dataURL = fileReader.result
+            if (typeof dataURL === 'string' && dataURL.startsWith('data:image')) {
+                onContentChange(pageId, id, dataURL)
+            }
+        });
+    }
 
     return (
         <div>
@@ -58,7 +73,7 @@ function ContentBlock({ id, type, value, onContentChange, editMode }: ContentBlo
                                 type="file"
                                 name="thumbnail"
                                 accept={allowedExtensions.join(", ")}
-                                onChange={handleContentChange}
+                                onChange={handleImageContentChange}
                                 className="file-input file-input-bordered w-full"
                             />
                         </div>
