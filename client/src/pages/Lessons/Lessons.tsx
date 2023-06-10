@@ -9,7 +9,7 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import trpc from "../../services/trpc";
 import { useState } from "react";
-import { LightBulbIcon } from "@heroicons/react/24/outline";
+import { LightBulbIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { CellDblClickEvent } from 'devextreme/ui/data_grid';
 import LessonPreview from "./components/LessonPreview";
 
@@ -41,22 +41,29 @@ export default function Timelines() {
         setSelectedLessonId(data.id)
     }
 
+    const formatToXP = ({ value }: { value: number }) => `${value} XP`
+
     return (
         <div className="flex-1 flex flex-col">
             <div className="flex flex-row justify-between items-baseline">
                 <h1 className="text-3xl font-bold">
                     Lessons
                 </h1>
-                <select
-                    onChange={handleSeasonChange}
-                    className="select select-bordered w-52"
-                    value={selectedSeason}
-                >
-                    <option value="spring">Spring</option>
-                    <option value="summer">Summer</option>
-                    <option value="autumn">Autumn</option>
-                    <option value="winter">Winter</option>
-                </select>
+                <div className="flex space-x-2">
+                    <button className="btn bg-base-100 border-base-300">
+                        <PlusIcon className="h-4 w-4" />
+                    </button>
+                    <select
+                        onChange={handleSeasonChange}
+                        className="select select-bordered w-52"
+                        value={selectedSeason}
+                    >
+                        <option value="spring">Spring</option>
+                        <option value="summer">Summer</option>
+                        <option value="autumn">Autumn</option>
+                        <option value="winter">Winter</option>
+                    </select>
+                </div>
             </div>
 
             <DataGrid
@@ -73,7 +80,7 @@ export default function Timelines() {
                 <HeaderFilter visible={true} />
                 <SearchPanel visible={true} highlightCaseSensitive={true} width={200} />
                 <Column dataField="holiday_name" dataType="string" />
-                <Column dataField="xp_reward" dataType="number" />
+                <Column dataField="xp_reward" dataType="number" customizeText={formatToXP} />
                 <Column dataField="page_count" dataType="number" />
                 <Column dataField="question_count" dataType="number" />
                 <Column dataField="has_reward" dataType="boolean" />
@@ -107,7 +114,7 @@ export default function Timelines() {
             ) : <div className="divider mt-6">
                 <div className="flex items-center space-x-2 text-neutral-400">
                     <LightBulbIcon className="h-4 w-4" />
-                    <p>Tip: Select a lesson to view more information about it</p>
+                    <p>Tip: Double click a lesson to preview it</p>
                 </div>
             </div>}
         </div >
