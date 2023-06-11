@@ -41,9 +41,26 @@ export const updateQuestionsInputSchema = z.object({
     }))
 });
 
+export const createRewardInputSchema = z.object({
+    season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+    lessonId: z.string(),
+    reward: z.object({
+        name: z.string(),
+        thumbnail: z.string(),
+    })
+});
+
+export const deleteRewardInputSchema = z.object({
+    season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+    lessonId: z.string(),
+    rewardId: z.string()
+});
+
 export type UpdateGeneralInput = z.infer<typeof updateGeneralInfoInputSchema>;
 export type UpdateContentInput = z.infer<typeof updateContentInputSchema>;
 export type UpdateQuestionsInput = z.infer<typeof updateQuestionsInputSchema>;
+export type CreateRewardInput = z.infer<typeof createRewardInputSchema>;
+export type DeleteRewardInput = z.infer<typeof deleteRewardInputSchema>;
 
 export const updateLessonGeneralInfo =
     async (season: Season, lessonId: string, generalInfo: UpdateGeneralInput['generalInfo']) => {

@@ -22,14 +22,16 @@ function RewardTab({ season, lessonId, reward }: QuestionsTabProps
 
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
-    const rewardDeleteMutation = trpc.reward.deleteRewardById.useMutation()
+    const lessonRewardDeleteMutation = trpc.lesson.deleteLessonReward.useMutation()
     const rewardUpdateMutation = trpc.reward.updateRewardById.useMutation()
-    const rewardCreateMutation = trpc.reward.createReward.useMutation()
+    const lessonRewardCreateMutation = trpc.lesson.createLessonReward.useMutation()
     const trpcContext = trpc.useContext()
 
     const handleAddReward = () => {
         const newReward = { name, thumbnail }
-        rewardCreateMutation.mutate(newReward, {
+        const mutationPayload = { season, lessonId, reward: newReward }
+
+        lessonRewardCreateMutation.mutate(mutationPayload, {
             onSuccess: () => {
                 trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
                 setIsEditing(false)
@@ -52,7 +54,8 @@ function RewardTab({ season, lessonId, reward }: QuestionsTabProps
     const handleDeleteReward = () => {
         if (!reward) return
 
-        rewardDeleteMutation.mutate(reward.id, {
+        const mutationPayload = { season, lessonId, rewardId: reward.id }
+        lessonRewardDeleteMutation.mutate(mutationPayload, {
             onSuccess: () => {
                 trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
                 setIsEditing(false)

@@ -19,6 +19,10 @@ import {
 } from '../services/lessonsDeleteService.js';
 
 import {
+    createLessonReward,
+    createRewardInputSchema,
+    deleteLessonReward,
+    deleteRewardInputSchema,
     updateContentInputSchema,
     updateGeneralInfoInputSchema,
     updateLessonContent,
@@ -65,6 +69,18 @@ export const lessonRouter = router({
         .input(updateQuestionsInputSchema)
         .mutation(async ({ input: { season, lessonId, questions } }) => {
             return await updateLessonQuestions(season, lessonId, questions)
+        }),
+
+    createLessonReward: protectedProcedure
+        .input(createRewardInputSchema)
+        .mutation(async ({ input: { season, lessonId, reward } }) => {
+            return await createLessonReward(season, lessonId, reward)
+        }),
+
+    deleteLessonReward: protectedProcedure
+        .input(deleteRewardInputSchema)
+        .mutation(async ({ input: { season, lessonId, rewardId } }) => {
+            return await deleteLessonReward(season, lessonId, rewardId)
         }),
 
     deleteLessonById: protectedProcedure

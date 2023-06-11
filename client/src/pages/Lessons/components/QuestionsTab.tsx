@@ -20,7 +20,7 @@ function QuestionsTab({ season, lessonId, questions = [] }: QuestionsTabProps) {
     const [modifiedQuestions, setModifiedQuestions] = useState(questions)
     const [isEditing, setIsEditing] = useState<boolean>(false)
 
-    const lessonContentMutation = trpc.lesson.updateLessonQuestions.useMutation()
+    const lessonQuestionMutation = trpc.lesson.updateLessonQuestions.useMutation()
     const trpcContext = trpc.useContext()
 
     const handleQuestionChange = (questionId: number, changedQuestion: Question) => {
@@ -41,7 +41,7 @@ function QuestionsTab({ season, lessonId, questions = [] }: QuestionsTabProps) {
     }
 
     const handleSaveQuestion = () => {
-        lessonContentMutation.mutate(
+        lessonQuestionMutation.mutate(
             { season, lessonId, questions: modifiedQuestions }, {
             onSuccess: () => {
                 trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
