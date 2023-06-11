@@ -61,7 +61,15 @@ function ChoiceBlock({
             </div>
         </div>
     ) : (
-        <p className="text-justify">{value}</p>
+        <div className="flex items-center space-x-2">
+            <input
+                type="checkbox"
+                name={`answer-${questionId}`}
+                className="checkbox checked:checkbox-success"
+                checked={answer === id}
+            />
+            <p className="text-justify">{value}</p>
+        </div>
     )
 }
 

@@ -24,7 +24,7 @@ function TitleBlock({ title, editMode, onChange }: TitleBlockProps) {
             />
         </div>
     ) : (
-        <h1 className="font-semibold text-xl text-neutral">
+        <h1 className="font-semibold text-2xl text-neutral">
             {title}
         </h1>
     )

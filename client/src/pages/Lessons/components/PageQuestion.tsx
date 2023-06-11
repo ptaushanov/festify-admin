@@ -60,13 +60,13 @@ function PageQuestion({
     }
 
     return (
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col">
             <TitleBlock
                 title={title}
                 editMode={isEditMode}
                 onChange={handleTitleChange}
             />
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-4 mt-6">
                 {choices.map((value, index) => (
                     <ChoiceBlock
                         key={index}
