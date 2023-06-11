@@ -2,6 +2,7 @@ import Tabs from '../../../components/Tabs/Tabs';
 import trpc from '../../../services/trpc';
 import GeneralTab from './GeneralTab';
 import PagesTab from './PagesTab';
+import QuestionsTab from './QuestionsTab';
 
 interface LessonPreviewProps {
     season: "spring" | "summer" | "autumn" | "winter"
@@ -43,7 +44,11 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         },
         {
             tabName: "Questions",
-            tabContent: null
+            tabContent: <QuestionsTab
+                season={season}
+                lessonId={lessonId}
+                questions={questions}
+            />
         },
         {
             tabName: "Reward",

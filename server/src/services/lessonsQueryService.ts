@@ -34,6 +34,7 @@ export const getLessonByIdOutputSchema = z.object({
     questions: z.array(z.object({
         answer: z.number(),
         choices: z.array(z.string()),
+        title: z.string()
     })),
     reward: z.unknown().optional(),
     xp_reward: z.number(),
