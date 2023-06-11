@@ -16,12 +16,7 @@ interface QuestionsTabProps {
     questions?: Question[];
 }
 
-function QuestionsTab({
-    season,
-    lessonId,
-    questions = [],
-}: QuestionsTabProps
-) {
+function QuestionsTab({ season, lessonId, questions = [] }: QuestionsTabProps) {
     const [modifiedQuestions, setModifiedQuestions] = useState(questions)
     const [isEditing, setIsEditing] = useState<boolean>(false)
 

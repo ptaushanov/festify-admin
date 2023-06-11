@@ -137,3 +137,32 @@ export function checkDocExists(
         });
     }
 }
+
+export async function deleteTimelineData(
+    season: string,
+    lessonRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
+) {
+    const timelineDoc = await findTimelineDoc(season);
+    checkDocExists(timelineDoc);
+
+    const { holidays } = timelineDoc.data() as TimelineOutput;
+    const holidayIndex = holidays.findIndex((holiday) => {
+        const holidayLessonRef = holiday.lessonRef as FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>;
+        return holidayLessonRef.id === lessonRef.id
+    });
+
+    if (holidayIndex === -1) return;
+    const { thumbnail } = holidays[holidayIndex];
+    await deleteImage(thumbnail);
+
+    const updatedHolidays = [...holidays];
+    updatedHolidays.splice(holidayIndex, 1);
+    await updateHolidays(timelineDoc, updatedHolidays);
+}
+
+async function updateHolidays(
+    timelineDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>,
+    updatedHolidays: TimelineOutput["holidays"]
+) {
+    await timelineDoc.ref.update({ holidays: updatedHolidays });
+}

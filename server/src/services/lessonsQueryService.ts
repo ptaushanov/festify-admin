@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { adminDB } from "../firebase-admin.js";
 import { TRPCError } from "@trpc/server";
+import { getRewardData, checkRewardExists } from "./rewardService.js";
+import { Reward } from "../types/reward.js";
 
 export const viewLessonsInputSchema = z.object({
     season: z.enum(["spring", "summer", "autumn", "winter"]),
@@ -69,7 +71,6 @@ export const getLessonsBySeason = async (season: Season) => {
     })
 
     return { lessons }
-
 }
 export const getLessonById = async (season: Season, lessonId: string) => {
     const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
@@ -79,7 +80,14 @@ export const getLessonById = async (season: Season, lessonId: string) => {
     const lessonData = lessonDoc.data()
     const id = lessonDoc.id
 
-    return { id, ...lessonData } as LessonByIdOutput
+    let reward = lessonData?.reward
+    if (reward) {
+        const rewardDoc = await getRewardData(reward)
+        checkRewardExists(rewardDoc)
+        reward = rewardDoc.data() as Reward
+    }
+
+    return { id, ...lessonData, reward } as LessonByIdOutput
 }
 
 async function getLessonDocById(
