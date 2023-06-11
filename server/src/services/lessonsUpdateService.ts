@@ -28,8 +28,19 @@ export const updateContentInputSchema = z.object({
     ))
 });
 
+export const updateQuestionsInputSchema = z.object({
+    season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+    lessonId: z.string(),
+    questions: z.array(z.object({
+        title: z.string(),
+        answer: z.number(),
+        choices: z.array(z.string()),
+    }))
+});
+
 export type UpdateGeneralInput = z.infer<typeof updateGeneralInfoInputSchema>;
 export type UpdateContentInput = z.infer<typeof updateContentInputSchema>;
+export type UpdateQuestionsInput = z.infer<typeof updateQuestionsInputSchema>;
 
 export const updateLessonGeneralInfo =
     async (season: Season, lessonId: string, generalInfo: UpdateGeneralInput['generalInfo']) => {
@@ -64,6 +75,22 @@ export const updateLessonContent =
             new TRPCError({
                 code: 'INTERNAL_SERVER_ERROR',
                 message: "Error updating lesson's content"
+            })
+        }
+    }
+
+export const updateLessonQuestions =
+    async (season: Season, lessonId: string, questions: UpdateQuestionsInput['questions']) => {
+        const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
+        const seasonLessons = seasonDoc.collection("lessons")
+        const lessonRef = seasonLessons.doc(lessonId);
+
+        try {
+            await lessonRef.update({ questions });
+        } catch (error) {
+            new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: "Error updating lesson's questions"
             })
         }
     }

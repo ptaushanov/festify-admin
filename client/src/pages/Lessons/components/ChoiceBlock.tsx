@@ -41,7 +41,7 @@ function ChoiceBlock({
                     <input
                         type="radio"
                         name={`answer-${questionId}`}
-                        onSelect={handleSelect}
+                        onChange={handleSelect}
                         className="radio"
                         defaultChecked={answer === id}
                     />

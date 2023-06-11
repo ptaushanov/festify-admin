@@ -2,6 +2,7 @@ import { useState } from "react";
 import TabbedContent from "../../../components/Tabs/TabbedContent";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import PageQuestion from "./PageQuestion";
+import trpc from "../../../services/trpc";
 
 type Question = {
     title: string;
@@ -24,6 +25,9 @@ function QuestionsTab({
     const [modifiedQuestions, setModifiedQuestions] = useState(questions)
     const [isEditing, setIsEditing] = useState<boolean>(false)
 
+    const lessonContentMutation = trpc.lesson.updateLessonQuestions.useMutation()
+    const trpcContext = trpc.useContext()
+
     const handleQuestionChange = (questionId: number, changedQuestion: Question) => {
         const newQuestions = [...modifiedQuestions]
         newQuestions[questionId] = changedQuestion
@@ -42,7 +46,13 @@ function QuestionsTab({
     }
 
     const handleSaveQuestion = () => {
-        console.log(modifiedQuestions)
+        lessonContentMutation.mutate(
+            { season, lessonId, questions: modifiedQuestions }, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
+                setIsEditing(false)
+            }
+        })
     }
 
     const pageElements = modifiedQuestions.map(({ answer, choices, title }, index) => (
