@@ -1,10 +1,26 @@
 import { useState } from "react";
+import trpc from '../../../services/trpc';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from "zod";
 
 interface GeneralTabProps {
     holidayName?: string;
     xpReward?: number;
     lastForSeason?: boolean;
 }
+
+const updateLessonInfoSchema = z.object({
+    holiday_name: z.string()
+        .nonempty(),
+    xp_reward: z.number()
+        .int()
+        .min(0)
+        .max(1000),
+    last_for_season: z.boolean()
+});
+
+type LessonUpdateType = z.infer<typeof updateLessonInfoSchema>;
 
 function GeneralTab({
     holidayName = '',
@@ -13,8 +29,24 @@ function GeneralTab({
 }: GeneralTabProps) {
     const [isEditing, setIsEditing] = useState<boolean>(false)
 
+    const {
+        register, reset, handleSubmit,
+        formState: { errors }
+    } = useForm<LessonUpdateType>({
+        resolver: zodResolver(updateLessonInfoSchema),
+    });
+
+    const onSubmit = async (lesson: LessonUpdateType) => {
+        console.log(lesson)
+    };
+
+    const handleReset = () => {
+        reset()
+        setIsEditing(!isEditing)
+    }
+
     return (
-        <div className="py-2 px-4 flex flex-col space-y-2">
+        <form className="py-2 px-4 flex flex-col space-y-2" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex space-x-4">
                 <div className="form-control w-full">
                     <label className="label">
@@ -24,11 +56,16 @@ function GeneralTab({
                     </label>
                     <input
                         type="text"
-                        name="holiday_name"
                         className="input input-bordered"
                         disabled={!isEditing}
                         defaultValue={holidayName}
+                        {...register("holiday_name")}
                     />
+                    <label className={`label ${!errors.holiday_name ? 'hidden' : ''}`}>
+                        <span className="label-text-alt text-error font-semibold">
+                            {errors.holiday_name?.message}
+                        </span>
+                    </label>
                 </div>
                 <div className="form-control w-full">
                     <label className="label">
@@ -38,11 +75,16 @@ function GeneralTab({
                     </label>
                     <input
                         type="number"
-                        name="holiday_name"
                         className="input input-bordered"
                         disabled={!isEditing}
                         defaultValue={xpReward}
+                        {...register("xp_reward", { valueAsNumber: true })}
                     />
+                    <label className={`label ${!errors.xp_reward ? 'hidden' : ''}`}>
+                        <span className="label-text-alt text-error font-semibold">
+                            {errors.xp_reward?.message}
+                        </span>
+                    </label>
                 </div>
             </div>
             <div className="flex">
@@ -56,19 +98,22 @@ function GeneralTab({
                             className="toggle"
                             disabled={!isEditing}
                             defaultChecked={lastForSeason}
+                            {...register("last_for_season")}
                         />
                     </label>
                 </div>
                 <div className="flex flex-1 justify-end">
                     {isEditing && (
-                        <button className="btn btn-neutral mr-2">Save</button>
+                        <button type="submit" className="btn btn-neutral mr-2">
+                            Save
+                        </button>
                     )}
-                    <button className="btn" onClick={() => setIsEditing(!isEditing)}>
+                    <button type="button" className="btn" onClick={handleReset}>
                         {isEditing ? "Cancel" : "Edit"}
                     </button>
                 </div>
             </div>
-        </div>
+        </form>
     )
 }
 
