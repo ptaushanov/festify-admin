@@ -5,6 +5,9 @@ import { TRPCError } from "@trpc/server";
 import { Lesson } from "../types/lesson.js";
 import { createDownloadUrl } from "../utils/createImageDownload.js";
 import { deleteImage } from "../utils/deleteImage.js";
+import { Reward } from "../types/reward.js";
+import { createReward, deleteRewardById } from "./rewardService.js";
+import admin from 'firebase-admin';
 
 export const updateGeneralInfoInputSchema = z.object({
     season: z.enum(['spring', 'summer', 'autumn', 'winter']),
@@ -95,6 +98,42 @@ export const updateLessonQuestions =
         }
     }
 
+export const createLessonReward =
+    async (season: Season, lessonId: string, reward: Reward) => {
+        const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
+        const seasonLessons = seasonDoc.collection("lessons")
+        const lessonRef = seasonLessons.doc(lessonId);
+
+        const { doc: rewardDoc } = await createReward(reward)
+
+        try {
+            await lessonRef.update({ reward: rewardDoc });
+        } catch (error) {
+            new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: "Error updating lesson's questions"
+            })
+        }
+    }
+
+export const deleteLessonReward =
+    async (season: Season, lessonId: string, rewardId: string) => {
+        const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
+        const seasonLessons = seasonDoc.collection("lessons")
+        const lessonRef = seasonLessons.doc(lessonId);
+
+        await deleteRewardById(rewardId)
+
+        try {
+            await lessonRef.update({ reward: admin.firestore.FieldValue.delete() });
+        } catch (error) {
+            new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: "Error updating lesson's questions"
+            })
+        }
+    }
+
 async function processContentBlocks(
     content: UpdateContentInput['content'],
     imageUploadPath: string
@@ -106,16 +145,25 @@ async function processContentBlocks(
         resultingContent[formattedPageId] = []
         for await (const contentBlock of pageContent) {
             const { value, type, oldValue } = contentBlock
-            let newValue = value
-
-            if (type === "image") {
-                if (oldValue) { await deleteImage(oldValue) }
-                newValue = await createDownloadUrl(imageUploadPath, value);
-            }
-
+            const newValue = await updateIfImageValue(type, imageUploadPath, value, oldValue);
             resultingContent[formattedPageId].push({ type, value: newValue })
         }
     }
-
     return resultingContent
+}
+
+async function updateIfImageValue(
+    type: string,
+    imageUploadPath: string,
+    value: string,
+    oldValue: string | undefined
+) {
+    let newValue = value;
+    if (type === "image") {
+        newValue = await createDownloadUrl(imageUploadPath, value);
+        if (oldValue && oldValue !== newValue) {
+            await deleteImage(oldValue);
+        }
+    }
+    return newValue;
 }

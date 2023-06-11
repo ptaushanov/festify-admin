@@ -34,14 +34,22 @@ export async function createReward({ name, thumbnail }: Reward) {
 
     const rewardCollection = adminDB.collection("rewards")
     const reward: Reward = { name, thumbnail: thumbnailURL };
-    await createRewardDoc(rewardCollection, reward);
+    const rewardDoc = await createRewardDoc(rewardCollection, reward);
 
-    return { message: "Reward created successfully" };
+    return { message: "Reward created successfully", doc: rewardDoc };
 }
-export async function updateRewardById(rewardId: string, reward: UpdateRewardInput['reward']) {
+export async function updateRewardById(rewardId: string, { name, thumbnail }: Reward) {
     const rewardRef = adminDB.collection("rewards").doc(rewardId);
     const rewardDoc = await getRewardData(rewardRef);
     checkRewardExists(rewardDoc);
+
+    const { thumbnail: oldThumbnail } = rewardDoc.data() as Reward;
+    const uploadPath = "images/rewards"
+
+    const thumbnailURL = await createDownloadUrl(uploadPath, thumbnail);
+    if (oldThumbnail !== thumbnailURL) { await deleteImage(oldThumbnail) }
+
+    const reward: Reward = { name, thumbnail: thumbnailURL };
     await updateRewardDoc(rewardRef, reward);
     return { message: "Reward updated successfully" };
 }
@@ -62,7 +70,7 @@ async function createRewardDoc(
     reward: Reward
 ) {
     try {
-        await rewardCollection.add(reward);
+        return await rewardCollection.add(reward);
     } catch (error) {
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
