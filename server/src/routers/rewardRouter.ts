@@ -6,8 +6,10 @@ import {
     deleteRewardById,
     viewRewardOutputSchema,
     updateRewardInputSchema,
+    createReward,
 } from '../services/rewardService.js';
 import { z } from 'zod';
+import { rewardSchema } from '../types/reward.js';
 
 export const rewardRouter = router({
     getRewardById: protectedProcedure
@@ -15,6 +17,12 @@ export const rewardRouter = router({
         .output(viewRewardOutputSchema)
         .query(async ({ input: id }) => {
             return await getRewardById(id)
+        }),
+
+    createReward: protectedProcedure
+        .input(rewardSchema)
+        .mutation(async ({ input: reward }) => {
+            return await createReward(reward)
         }),
 
     updateRewardById: protectedProcedure

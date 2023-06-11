@@ -38,7 +38,11 @@ export const getLessonByIdOutputSchema = z.object({
         choices: z.array(z.string()),
         title: z.string()
     })),
-    reward: z.unknown().optional(),
+    reward: z.object({
+        id: z.string(),
+        name: z.string(),
+        thumbnail: z.string(),
+    }).optional(),
     xp_reward: z.number(),
     last_for_season: z.boolean().default(false),
 });
@@ -84,7 +88,10 @@ export const getLessonById = async (season: Season, lessonId: string) => {
     if (reward) {
         const rewardDoc = await getRewardData(reward)
         checkRewardExists(rewardDoc)
-        reward = rewardDoc.data() as Reward
+        const { id } = rewardDoc
+        const partialRewardData = rewardDoc.data() as Reward
+
+        reward = { ...partialRewardData, id }
     }
 
     return { id, ...lessonData, reward } as LessonByIdOutput

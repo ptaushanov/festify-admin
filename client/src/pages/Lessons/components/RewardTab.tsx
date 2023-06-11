@@ -3,6 +3,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import trpc from "../../../services/trpc";
 
 type Reward = {
+    id: string;
     name: string;
     thumbnail: string;
 }
@@ -15,48 +16,91 @@ interface QuestionsTabProps {
 
 function RewardTab({ season, lessonId, reward }: QuestionsTabProps
 ) {
-    const [isEditMode, setIsEditMode] = useState<boolean>(false)
-    const [modifiedReward, setModifiedReward] = useState<Reward | null>(reward ?? null)
+    const [isEditing, setIsEditing] = useState<boolean>(false)
+    const [thumbnail, setThumbnail] = useState<string>(reward?.thumbnail ?? '')
+    const [name, setName] = useState<string>(reward?.name ?? '')
+
     const allowedExtensions = ["jpg", "jpeg", "png"]
 
+    const rewardDeleteMutation = trpc.reward.deleteRewardById.useMutation()
+    const rewardUpdateMutation = trpc.reward.updateRewardById.useMutation()
+    const rewardCreateMutation = trpc.reward.createReward.useMutation()
+    const trpcContext = trpc.useContext()
+
     const handleAddReward = () => {
-        setModifiedReward({ name: "", thumbnail: "" })
-        setIsEditMode(true)
+        const newReward = { name, thumbnail }
+        rewardCreateMutation.mutate(newReward, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
+                setIsEditing(false)
+            }
+        })
+    }
+
+    const handleEditReward = () => {
+        if (!reward) return
+
+        const newReward = { name, thumbnail }
+        rewardUpdateMutation.mutate({ id: reward.id, reward: newReward }, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
+                setIsEditing(false)
+            }
+        })
+    }
+
+    const handleDeleteReward = () => {
+        if (!reward) return
+
+        rewardDeleteMutation.mutate(reward.id, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
+                setIsEditing(false)
+            }
+        })
+    }
+
+    const handleSaveReward = () => {
+        if (reward) handleEditReward()
+        else handleAddReward()
     }
 
     const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const thumbnail = event.target.files?.[0]
-        if (!modifiedReward || !thumbnail) return
+        const newThumbnail = event.target.files?.[0]
+        if (!newThumbnail) return
 
         const fileReader = new FileReader()
-        fileReader.readAsDataURL(thumbnail)
+        fileReader.readAsDataURL(newThumbnail)
         fileReader.addEventListener('load', () => {
             const result = fileReader.result
             if (typeof result === 'string' && result.startsWith('data:image')) {
-                setModifiedReward({ ...modifiedReward, thumbnail: result })
+                setThumbnail(result)
             }
         });
     }
 
-    if (!modifiedReward) return (
+    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newName = event.target.value
+        setName(newName)
+    }
+
+    if (!reward && !isEditing) return (
         <div className="h-60 flex flex-col items-center justify-center text-neutral-400">
             <p className="text-xl font-semibold ">
                 No additional reward in this lesson
             </p>
             <p className="text-sm">Click on the button bellow to add one</p>
             <button
-                onClick={handleAddReward}
+                onClick={() => setIsEditing(true)}
                 className="btn shadow-sm mt-4">
                 <PlusIcon className="h-5 w-5" />
             </button>
         </div>
     )
 
-    const { thumbnail, name } = modifiedReward
-
     return (
         <div className="p-6 flex flex-col space-y-4">
-            {isEditMode ? (
+            {isEditing ? (
                 <div className="flex flex-col space-y-4">
                     <div className="form-control bg-neutral-100 rounded-md py-2 px-4 w-full">
                         <label className="label">
@@ -84,21 +128,25 @@ function RewardTab({ season, lessonId, reward }: QuestionsTabProps
                         <input
                             type="text"
                             className="input input-bordered w-full"
-                            defaultValue={name}
+                            value={name}
+                            onChange={handleNameChange}
                         />
                     </div>
                     <div className="flex justify-between">
-                        <button onClick={() => null}
+                        <button onClick={handleDeleteReward}
                             className="btn hover:btn-error"
                         >
                             Delete
                         </button>
                         <div className="flex space-x-2">
-                            <button className="btn btn-neutral">
+                            <button
+                                onClick={handleSaveReward}
+                                className="btn btn-neutral"
+                            >
                                 Save
                             </button>
                             <button className="btn"
-                                onClick={() => setIsEditMode(false)}>
+                                onClick={() => setIsEditing(false)}>
                                 Close
                             </button>
                         </div>
@@ -113,7 +161,7 @@ function RewardTab({ season, lessonId, reward }: QuestionsTabProps
                             {name}
                         </h2>
                         <div className="card-actions justify-end">
-                            <button className="btn" onClick={() => setIsEditMode(true)}>
+                            <button className="btn" onClick={() => setIsEditing(true)}>
                                 Edit
                             </button>
                         </div>

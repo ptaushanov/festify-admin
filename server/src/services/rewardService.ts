@@ -1,6 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { adminDB } from "../firebase-admin";
+import { adminDB } from "../firebase-admin.js";
+import { Reward } from "../types/reward.js";
+import { createDownloadUrl } from "../utils/createImageDownload.js";
+import { deleteImage } from "../utils/deleteImage.js";
 
 export const viewRewardOutputSchema = z.object({
     id: z.string(),
@@ -16,7 +19,6 @@ export const updateRewardInputSchema = z.object({
     })
 });
 
-
 export type ViewRewardOutput = z.infer<typeof viewRewardOutputSchema>;
 export type UpdateRewardInput = z.infer<typeof updateRewardInputSchema>;
 
@@ -26,7 +28,16 @@ export async function getRewardById(rewardId: string) {
     checkRewardExists(rewardDoc);
     return rewardDoc.data() as ViewRewardOutput;
 }
+export async function createReward({ name, thumbnail }: Reward) {
+    const uploadPath = "images/rewards"
+    const thumbnailURL = await createDownloadUrl(uploadPath, thumbnail);
 
+    const rewardCollection = adminDB.collection("rewards")
+    const reward: Reward = { name, thumbnail: thumbnailURL };
+    await createRewardDoc(rewardCollection, reward);
+
+    return { message: "Reward created successfully" };
+}
 export async function updateRewardById(rewardId: string, reward: UpdateRewardInput['reward']) {
     const rewardRef = adminDB.collection("rewards").doc(rewardId);
     const rewardDoc = await getRewardData(rewardRef);
@@ -39,8 +50,25 @@ export async function deleteRewardById(rewardId: string) {
     const rewardRef = adminDB.collection("rewards").doc(rewardId);
     const rewardDoc = await getRewardData(rewardRef);
     checkRewardExists(rewardDoc);
+
+    const { thumbnail } = rewardDoc.data() as Reward;
+    await deleteImage(thumbnail);
     await deleteRewardDoc(rewardRef);
     return { message: "Reward deleted successfully" };
+}
+
+async function createRewardDoc(
+    rewardCollection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>,
+    reward: Reward
+) {
+    try {
+        await rewardCollection.add(reward);
+    } catch (error) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create reward",
+        });
+    }
 }
 
 export async function getRewardData(

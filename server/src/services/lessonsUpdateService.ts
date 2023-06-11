@@ -102,7 +102,7 @@ async function processContentBlocks(
     const resultingContent: Lesson['content'] = {}
 
     for await (const [pageId, pageContent] of Object.entries(content)) {
-        const formattedPageId = `page${pageId}`
+        const formattedPageId = pageId.includes("page") ? pageId : `page${pageId}`
         resultingContent[formattedPageId] = []
         for await (const contentBlock of pageContent) {
             const { value, type, oldValue } = contentBlock
