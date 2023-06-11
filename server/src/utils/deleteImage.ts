@@ -3,9 +3,7 @@ import { deleteObject, ref } from "firebase/storage";
 import { clientStorage } from '../firebase-client.js';
 
 export async function deleteImages(images: string[]) {
-    await Promise.all(images.map(async (image) => {
-        await deleteImage(image);
-    }));
+    await Promise.all(images.map((image) => deleteImage(image)));
 }
 
 export async function deleteImage(image: string) {

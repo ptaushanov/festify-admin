@@ -35,6 +35,8 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         {
             tabName: "Pages",
             tabContent: <PagesTab
+                season={season}
+                lessonId={lessonId}
                 pages={content}
                 holidayName={holiday_name}
             />

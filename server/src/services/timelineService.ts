@@ -1,10 +1,8 @@
 import { z } from 'zod';
 import { adminDB } from '../firebase-admin.js';
 import { TRPCError } from '@trpc/server';
-import { clientStorage } from '../firebase-client.js';
-import { ref, uploadString, getDownloadURL } from "firebase/storage"
-import { randomUUID } from 'crypto';
 import { deleteImage } from '../utils/deleteImage.js';
+import { createDownloadUrl } from '../utils/createImageDownload.js';
 
 export const timelineInputSchema = z.object({
     season: z.enum(['spring', 'summer', 'autumn', 'winter']),
@@ -62,7 +60,8 @@ export const updateHoliday = async (season: Season, index: number, holiday: Holi
     let downloadURL = oldThumbnailURL
     if (thumbnail && oldThumbnailURL) {
         await deleteImage(oldThumbnailURL);
-        downloadURL = await createDownloadUrl(season, thumbnail);
+        const uploadPath = `images/lessons/${season}`;
+        downloadURL = await createDownloadUrl(uploadPath, thumbnail);
     }
 
     // Update the holiday data inside the timeline
@@ -111,14 +110,6 @@ function updateHolidayData(
 
     if (celebrated_on) { updatedHoliday.celebrated_on = celebrated_on; }
     return updatedHoliday;
-}
-
-export async function createDownloadUrl(season: Season, thumbnail: string) {
-    const uploadPath = `images/lessons/${season}/${randomUUID()}}`;
-    const uploadRef = ref(clientStorage, uploadPath);
-
-    const uploadTask = await uploadString(uploadRef, thumbnail, 'data_url');
-    return await getDownloadURL(uploadTask.ref);
 }
 
 export async function findTimelineDoc(season: string) {

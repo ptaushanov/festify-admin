@@ -2,26 +2,31 @@ import { useState } from "react";
 import TabbedContent from "../../../components/Tabs/TabbedContent";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import PageContent from "./PageContent";
-
-type ContentBlock = {
-    type: "text" | "image";
-    value: string;
-}
-
-type VersionedContentBlock = ContentBlock & {
-    oldValue?: string;
-}
+import trpc from "../../../services/trpc";
 
 interface PagesTabProps {
+    season: "spring" | "summer" | "autumn" | "winter";
+    lessonId: string;
     holidayName?: string;
-    pages?: {
-        [x: string]: VersionedContentBlock[]
-    };
+    pages?: Record<string, {
+        value: string;
+        type: "text" | "image";
+        oldValue?: string
+    }[]>
 }
 
-function PagesTab({ pages = {}, holidayName = "" }: PagesTabProps) {
+function PagesTab({
+    season,
+    lessonId,
+    pages = {},
+    holidayName = ""
+}: PagesTabProps
+) {
     const [modifiedPages, setModifiedPages] = useState(pages)
     const [isEditing, setIsEditing] = useState<boolean>(false)
+
+    const lessonContentMutation = trpc.lesson.updateLessonContent.useMutation()
+    const trpcContext = trpc.useContext()
 
     const handleContentChange = (pageId: string, id: number, newValue: string, oldValue?: string) => {
         const newPage = structuredClone(modifiedPages[pageId])
@@ -63,7 +68,16 @@ function PagesTab({ pages = {}, holidayName = "" }: PagesTabProps) {
     }
 
     const handleSavePages = () => {
-        console.log(modifiedPages)
+        lessonContentMutation.mutate({
+            season,
+            lessonId,
+            content: modifiedPages
+        }, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season, lessonId })
+                setIsEditing(false)
+            }
+        })
     }
 
     const pageElements = Object.entries(modifiedPages)

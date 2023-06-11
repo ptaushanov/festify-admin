@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-import { createDownloadUrl } from "./timelineService.js";
+import { createDownloadUrl } from "../utils/createImageDownload.js";
 import { Season } from "./lessonsQueryService.js";
 import { adminDB } from "../firebase-admin.js";
 import { z } from "zod";
@@ -22,12 +22,13 @@ export const createLesson = async (season: Season, lesson: CreateLessonInput['le
     const seasonDoc = adminDB.collection(`/seasons_holidays`).doc(season)
     const seasonLessons = seasonDoc.collection("lessons")
     const lessonDoc = await addNewLesson(seasonLessons, lesson)
+    const uploadImagePath = `images/lessons/${season}`;
 
     const { celebrated_on, thumbnail, holiday_name } = lesson;
     const newHoliday = {
         celebrated_on,
         name: holiday_name,
-        thumbnail: await createDownloadUrl(season, thumbnail),
+        thumbnail: await createDownloadUrl(uploadImagePath, thumbnail),
         lessonRef: lessonDoc
     };
 
