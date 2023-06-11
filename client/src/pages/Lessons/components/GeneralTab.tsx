@@ -3,8 +3,11 @@ import trpc from '../../../services/trpc';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
+import toast from "react-hot-toast";
 
 interface GeneralTabProps {
+    season: "spring" | "summer" | "autumn" | "winter";
+    lessonId: string;
     holidayName?: string;
     xpReward?: number;
     lastForSeason?: boolean;
@@ -23,11 +26,16 @@ const updateLessonInfoSchema = z.object({
 type LessonUpdateType = z.infer<typeof updateLessonInfoSchema>;
 
 function GeneralTab({
+    season,
+    lessonId,
     holidayName = '',
     lastForSeason = false,
     xpReward = 0
 }: GeneralTabProps) {
     const [isEditing, setIsEditing] = useState<boolean>(false)
+
+    const lessonMutation = trpc.lesson.updateLessonGeneralInfo.useMutation()
+    const trpcContext = trpc.useContext()
 
     const {
         register, reset, handleSubmit,
@@ -36,8 +44,13 @@ function GeneralTab({
         resolver: zodResolver(updateLessonInfoSchema),
     });
 
-    const onSubmit = async (lesson: LessonUpdateType) => {
-        console.log(lesson)
+    const onSubmit = async (generalInfo: LessonUpdateType) => {
+        lessonMutation.mutate({ season, lessonId, generalInfo }, {
+            onSuccess: () => {
+                trpcContext.lesson.getLessonById.invalidate({ season })
+                setIsEditing(false)
+            }
+        })
     };
 
     const handleReset = () => {

@@ -19,6 +19,10 @@ import {
 } from '../services/lessonsDeleteService.js';
 
 import protectedProcedure from '../procedures/protectedProcedure.js';
+import {
+    updateGeneralInfoInputSchema,
+    updateLessonGeneralInfo,
+} from '../services/lessonsUpdateService.js';
 
 export const lessonRouter = router({
     getLessonsBySeason: protectedProcedure
@@ -39,6 +43,12 @@ export const lessonRouter = router({
         .input(createLessonInputSchema)
         .mutation(async ({ input: { season, lesson } }) => {
             return await createLesson(season, lesson)
+        }),
+
+    updateLessonGeneralInfo: protectedProcedure
+        .input(updateGeneralInfoInputSchema)
+        .mutation(async ({ input: { season, lessonId, generalInfo } }) => {
+            return await updateLessonGeneralInfo(season, lessonId, generalInfo)
         }),
 
     deleteLessonById: protectedProcedure

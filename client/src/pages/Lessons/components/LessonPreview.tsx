@@ -25,6 +25,8 @@ function LessonPreview({ season, lessonId }: LessonPreviewProps) {
         {
             tabName: "General",
             tabContent: <GeneralTab
+                season={season}
+                lessonId={lessonId}
                 holidayName={holiday_name}
                 xpReward={xp_reward}
                 lastForSeason={last_for_season}
