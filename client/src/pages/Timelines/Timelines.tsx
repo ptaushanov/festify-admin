@@ -47,7 +47,7 @@ export default function Timelines() {
     return (
         <div className="flex-1 flex flex-col">
             <div className="flex flex-row justify-between items-baseline">
-                <h1 className="text-3xl font-bold">
+                <h1 className="text-4xl font-bold">
                     Timelines
                 </h1>
                 <select

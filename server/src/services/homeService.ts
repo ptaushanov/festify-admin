@@ -35,8 +35,8 @@ async function getLessonsCount(seasons: string[]): Promise<number> {
 
 async function getUsersCount() {
     try {
-        const users = await admin.auth().listUsers();
-        return users.users.length;
+        const userRecords = await admin.auth().listUsers();
+        return userRecords.users.length;
     }
     catch (error) {
         throw new TRPCError({

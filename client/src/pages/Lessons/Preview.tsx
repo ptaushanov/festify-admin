@@ -44,7 +44,7 @@ function Preview() {
                 </a>
             </div>
             <div className="flex items-center justify-between mt-2">
-                <h1 className="text-3xl font-bold">
+                <h1 className="text-4xl font-bold">
                     Lesson Preview
                 </h1>
                 {hasNeededParams && isSeasonValid ?

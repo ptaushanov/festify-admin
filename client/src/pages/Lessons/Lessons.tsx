@@ -49,7 +49,7 @@ export default function Lessons() {
     return (
         <div className="flex-1 flex flex-col">
             <div className="flex flex-row justify-between items-baseline">
-                <h1 className="text-3xl font-bold">
+                <h1 className="text-4xl font-bold">
                     Lessons
                 </h1>
                 <div className="flex space-x-2">
