@@ -11,6 +11,8 @@ export const viewRewardOutputSchema = z.object({
     thumbnail: z.string(),
 });
 
+export const viewRewardsOutputSchema = z.array(viewRewardOutputSchema);
+
 export const updateRewardInputSchema = z.object({
     id: z.string(),
     reward: z.object({
@@ -20,7 +22,18 @@ export const updateRewardInputSchema = z.object({
 });
 
 export type ViewRewardOutput = z.infer<typeof viewRewardOutputSchema>;
+export type ViewRewardsOutput = z.infer<typeof viewRewardsOutputSchema>;
 export type UpdateRewardInput = z.infer<typeof updateRewardInputSchema>;
+
+export async function getRewards() {
+    const rewardsSnapshot = await adminDB.collection("rewards").get();
+    const rewards = rewardsSnapshot.docs.map(rewardDoc => {
+        const reward = rewardDoc.data() as Reward;
+        return { id: rewardDoc.id, ...reward };
+    })
+
+    return rewards;
+}
 
 export async function getRewardById(rewardId: string) {
     const rewardRef = adminDB.collection("rewards").doc(rewardId);

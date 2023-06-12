@@ -7,11 +7,17 @@ import {
     viewRewardOutputSchema,
     updateRewardInputSchema,
     createReward,
+    viewRewardsOutputSchema,
+    getRewards,
 } from '../services/rewardService.js';
 import { z } from 'zod';
 import { rewardSchema } from '../types/reward.js';
 
 export const rewardRouter = router({
+    getRewards: protectedProcedure
+        .output(viewRewardsOutputSchema)
+        .query(async () => await getRewards()),
+
     getRewardById: protectedProcedure
         .input(z.string())
         .output(viewRewardOutputSchema)
