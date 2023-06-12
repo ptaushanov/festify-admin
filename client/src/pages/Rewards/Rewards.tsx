@@ -1,8 +1,23 @@
+import { useRef, useState } from "react";
 import trpc from "../../services/trpc"
 import RewardCard from "./components/RewardCard";
+import RewardEditModal from "./components/RewardEditModal";
+
+type Reward = {
+    id: string;
+    name: string;
+    thumbnail: string;
+}
 
 export default function Rewards() {
+    const modalRef = useRef<HTMLDialogElement>(null)
+    const [selectedReward, setSelectedReward] = useState<Reward | null>(null)
     const { data, isError } = trpc.reward.getRewards.useQuery()
+
+    const handleRewardEdit = (reward: Reward) => {
+        setSelectedReward(reward)
+        modalRef.current?.showModal()
+    }
 
     if (isError) return (
         <div className="flex flex-1 justify-center items-center h-24">
@@ -18,16 +33,18 @@ export default function Rewards() {
                 Rewards
             </h1>
             <div className="flex flex-wrap mt-10 gap-6">
-                {data?.map(({ id, name, thumbnail }) => (
+                {data?.map((reward) => (
                     <RewardCard
-                        key={id}
-                        id={id}
-                        name={name}
-                        thumbnail={thumbnail}
-                        onEdit={(rewardId) => null}
+                        key={reward.id}
+                        reward={reward}
+                        onEdit={handleRewardEdit}
                     />
                 ))}
             </div>
+            <RewardEditModal
+                modalRef={modalRef}
+                reward={selectedReward}
+            />
         </div>
     )
 }

@@ -1,11 +1,17 @@
-interface RewardCardProps {
+type Reward = {
     id: string;
     name: string;
     thumbnail: string;
-    onEdit: (rewardId: string) => void;
 }
 
-function RewardCard({ id, name, thumbnail, onEdit }: RewardCardProps) {
+interface RewardCardProps {
+    reward: Reward
+    onEdit: (reward: Reward) => void;
+}
+
+function RewardCard({ reward, onEdit }: RewardCardProps) {
+    const { id, name, thumbnail } = reward
+
     return (
         <div className="card w-60 h-[18rem] bg-base-100 shadow-md self-center">
             <figure>
@@ -16,7 +22,7 @@ function RewardCard({ id, name, thumbnail, onEdit }: RewardCardProps) {
                     {name}
                 </h2>
                 <div className="card-actions justify-end">
-                    <button className="btn" onClick={() => onEdit(id)}>
+                    <button className="btn" onClick={() => onEdit(reward)}>
                         Edit
                     </button>
                 </div>
