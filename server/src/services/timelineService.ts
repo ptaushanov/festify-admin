@@ -72,7 +72,7 @@ export const updateHoliday = async (season: Season, index: number, holiday: Holi
     return { message: 'Holiday updated successfully' }
 }
 
-async function updateHolidaysInTimeline(
+export async function updateHolidaysInTimeline(
     timelineDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>,
     updatedHolidays: TimelineOutput["holidays"]
 ) {
@@ -86,7 +86,7 @@ async function updateHolidaysInTimeline(
     }
 }
 
-function updateHolidaysData(
+export function updateHolidaysData(
     holidays: TimelineOutput["holidays"],
     index: number,
     updatedHoliday: TimelineOutput["holidays"][number]) {

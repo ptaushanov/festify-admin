@@ -8,6 +8,13 @@ import { deleteImage } from "../utils/deleteImage.js";
 import { Reward } from "../types/reward.js";
 import { createReward, deleteRewardById } from "./rewardService.js";
 import admin from 'firebase-admin';
+import {
+    TimelineOutput,
+    checkDocExists,
+    findTimelineDoc,
+    updateHolidaysData,
+    updateHolidaysInTimeline
+} from "./timelineService.js";
 
 export const updateGeneralInfoInputSchema = z.object({
     season: z.enum(['spring', 'summer', 'autumn', 'winter']),
@@ -68,14 +75,8 @@ export const updateLessonGeneralInfo =
         const seasonLessons = seasonDoc.collection("lessons")
         const lessonRef = seasonLessons.doc(lessonId);
 
-        try {
-            await lessonRef.update(generalInfo);
-        } catch (error) {
-            new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: "Error updating lesson's general info"
-            })
-        }
+        await updateLessonDoc(lessonRef, generalInfo);
+        await updateHolidaysDoc(season, lessonRef, generalInfo.holiday_name);
 
         return { message: 'Lesson was updated successfully' }
     }
@@ -150,6 +151,44 @@ export const deleteLessonReward =
             })
         }
     }
+
+async function updateLessonDoc(
+    lessonRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>,
+    generalInfo: UpdateGeneralInput['generalInfo']) {
+    try {
+        await lessonRef.update(generalInfo);
+    } catch (error) {
+        new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: "Error updating lesson's general info"
+        });
+    }
+}
+
+async function updateHolidaysDoc(
+    season: Season,
+    lessonRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>,
+    holiday_name: string
+) {
+    const timelineDoc = await findTimelineDoc(season)
+    checkDocExists(timelineDoc)
+    const { holidays } = timelineDoc.data() as TimelineOutput
+    const holidayIndex = holidays.findIndex(holiday => {
+        const { lessonRef: { id } } = holiday as { lessonRef: { id: string } }
+        return id === lessonRef.id
+    })
+
+    if (holidayIndex === -1) throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Holiday ${holiday_name} does not exist`
+    })
+
+    const newHoliday = { ...holidays[holidayIndex] }
+    newHoliday.name = holiday_name
+
+    const updatedHolidays = updateHolidaysData(holidays, holidayIndex, newHoliday)
+    await updateHolidaysInTimeline(timelineDoc, updatedHolidays)
+}
 
 async function processContentBlocks(
     content: UpdateContentInput['content'],

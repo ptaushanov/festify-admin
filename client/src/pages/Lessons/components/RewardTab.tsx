@@ -8,13 +8,13 @@ type Reward = {
     thumbnail: string;
 }
 
-interface QuestionsTabProps {
+interface RewardTabProps {
     season: "spring" | "summer" | "autumn" | "winter";
     lessonId: string;
     reward?: Reward;
 }
 
-function RewardTab({ season, lessonId, reward }: QuestionsTabProps
+function RewardTab({ season, lessonId, reward }: RewardTabProps
 ) {
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [thumbnail, setThumbnail] = useState<string>(reward?.thumbnail ?? '')
