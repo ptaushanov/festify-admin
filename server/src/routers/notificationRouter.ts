@@ -5,7 +5,7 @@ import { notificationInputSchema, sendNotification } from '../services/notificat
 export const notificationRouter = router({
     sendNotification: protectedProcedure
         .input(notificationInputSchema)
-        .mutation(async ({ input: notificationBody }) => {
-            return await sendNotification(notificationBody)
+        .mutation(async ({ input: notification }) => {
+            return await sendNotification(notification)
         })
 });

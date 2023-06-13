@@ -1,16 +1,26 @@
 import expo from '../expo.js';
 import { z } from 'zod';
 import { adminDB } from '../firebase-admin.js';
-import Expo, { ExpoPushMessage, ExpoPushTicket, ExpoPushSuccessTicket, ExpoPushReceipt } from 'expo-server-sdk';
+import {
+    Expo,
+    ExpoPushMessage,
+    ExpoPushTicket,
+    ExpoPushSuccessTicket,
+    ExpoPushReceipt
+} from 'expo-server-sdk';
 import { TRPCError } from '@trpc/server';
 
-export const notificationInputSchema = z.string().min(1).max(255);
+export const notificationInputSchema = z.object({
+    title: z.string(),
+    body: z.string().min(1).max(255)
+});
+
 export type NotificationInput = z.infer<typeof notificationInputSchema>;
 
-export const sendNotification = async (body: NotificationInput) => {
+export const sendNotification = async ({ title, body }: NotificationInput) => {
     const usersSnapshot = await adminDB.collection('users').get();
     const expoPushTokens: string[] = extractNotificationTokens(usersSnapshot);
-    const messages: ExpoPushMessage[] = createExpoPushMessages(expoPushTokens, body);
+    const messages: ExpoPushMessage[] = createExpoPushMessages(expoPushTokens, title, body);
 
     const chunks: ExpoPushMessage[][] = expo.chunkPushNotifications(messages);
     const tickets: ExpoPushTicket[] = await chunkTickets(chunks);
@@ -46,9 +56,7 @@ async function checkReceipts(receiptIdChunks: string[][]) {
 function checkReceiptStatuses(receipts: { [id: string]: ExpoPushReceipt }) {
     for (const receiptId in receipts) {
         const { status, details } = receipts[receiptId];
-        if (status === 'ok') {
-            continue;
-        } else if (status === 'error') {
+        if (status === 'error') {
             if (details && details.error) {
                 console.error(`The error code is ${details.error}`);
             }
@@ -77,7 +85,7 @@ async function chunkTickets(chunks: ExpoPushMessage[][]) {
     return tickets;
 }
 
-function createExpoPushMessages(expoPushTokens: string[], body: string) {
+function createExpoPushMessages(expoPushTokens: string[], title: string, body: string) {
     const messages: ExpoPushMessage[] = [];
     for (const pushToken of expoPushTokens) {
         if (!Expo.isExpoPushToken(pushToken)) {
@@ -85,7 +93,7 @@ function createExpoPushMessages(expoPushTokens: string[], body: string) {
             continue;
         }
 
-        messages.push({ to: pushToken, sound: 'default', body });
+        messages.push({ to: pushToken, sound: 'default', body, title });
     }
     return messages;
 }
