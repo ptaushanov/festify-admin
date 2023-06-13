@@ -20,7 +20,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ disabled, value, onCh
         return () => { clearTimeout(delayTimer) };
     }, [searchTerm]);
 
-    const { data: emails } = trpc.email.searchEmails.useQuery(
+    const { data: emails } = trpc.email.searchEmailAddresses.useQuery(
         debouncedTerm, { enabled: debouncedTerm.length >= 2 && !value }
     );
 
@@ -55,7 +55,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ disabled, value, onCh
                     <button
                         disabled={disabled}
                         onClick={handleClearSelectedEmail}
-                        className=" btn join-item bg-base-100 border border-base-300 hover:btn-error">
+                        className="btn join-item bg-base-100 border border-base-300 hover:btn-error">
                         <XMarkIcon className="w-5 h-5" />
                     </button>
                 )}
