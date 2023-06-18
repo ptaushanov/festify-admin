@@ -5,6 +5,7 @@ import { lessonRouter } from './lessonsRouter.js';
 import { notificationRouter } from './notificationRouter.js';
 import { rewardRouter } from './rewardRouter.js';
 import { timelineRouter } from './timelineRouter.js';
+import { userRouter } from './userRouter.js';
 
 export const appRouter = router({
     home: homeRouter,
@@ -12,7 +13,8 @@ export const appRouter = router({
     lesson: lessonRouter,
     reward: rewardRouter,
     email: emailRouter,
-    notification: notificationRouter
+    notification: notificationRouter,
+    user: userRouter
 });
 
 // export type definition of API
