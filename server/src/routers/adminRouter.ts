@@ -4,7 +4,9 @@ import { z } from 'zod';
 import {
     viewAdminsOutputSchema,
     getAllAdmins,
-    deleteAdmin
+    deleteAdmin,
+    createAdminInputSchema,
+    createAdmin
 } from '../services/adminService.js';
 
 export const adminRouter = router({
@@ -18,5 +20,11 @@ export const adminRouter = router({
         .input(z.string())
         .mutation(async ({ input: adminId }) => {
             return await deleteAdmin(adminId);
+        }),
+
+    createAdmin: protectedProcedure
+        .input(createAdminInputSchema)
+        .mutation(async ({ input: adminData }) => {
+            return await createAdmin(adminData);
         })
 });

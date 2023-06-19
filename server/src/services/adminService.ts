@@ -8,7 +8,14 @@ export const viewAdminsOutputSchema = z.array(z.object({
     email: z.string().email().optional(),
 }));
 
+export const createAdminInputSchema = z.object({
+    username: z.string().min(3).max(20),
+    email: z.string().email(),
+    password: z.string().min(6).max(50),
+});
+
 export type ViewAdminsOutput = z.infer<typeof viewAdminsOutputSchema>;
+export type CreateAdminInput = z.infer<typeof createAdminInputSchema>;
 
 export async function getAllAdmins() {
     const adminsSnapshot = await getAdminDocs()
@@ -41,6 +48,25 @@ export async function deleteAdmin(adminId: string) {
     return { message: "Admin deleted successfully" }
 }
 
+export async function createAdmin(adminData: CreateAdminInput) {
+    const { username, email, password } = adminData;
+
+    try {
+        const { uid } = await admin.auth()
+            .createUser({ email, password });
+
+        await adminDB.collection("admins")
+            .doc(uid)
+            .set({ username });
+    } catch (error) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create admin",
+        });
+    }
+
+    return { message: "Admin created successfully" }
+}
 
 async function getAdminAuthData(id: string) {
     try {

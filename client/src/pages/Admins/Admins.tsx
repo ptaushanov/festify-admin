@@ -1,6 +1,6 @@
 import trpc from '../../services/trpc';
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import DataGrid, {
     Column,
@@ -11,6 +11,7 @@ import DataGrid, {
     SearchPanel,
     Toolbar
 } from "devextreme-react/data-grid";
+import AddAdminModal from './components/AddAdminModal';
 
 type Admin = {
     id: string
@@ -22,6 +23,7 @@ export default function Admins() {
     const pageSizes = [5, 10, 20]
     const { data } = trpc.admin.getAllAdmins.useQuery()
     const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null)
+    const modalRef = useRef<HTMLDialogElement>(null)
 
     const adminDeleteMutation = trpc.admin.deleteAdmin.useMutation()
     const trpcContext = trpc.useContext()
@@ -36,7 +38,7 @@ export default function Admins() {
         })
     }
 
-    const handleCreateAdminModalOpen = () => null
+    const handleCreateAdminModalOpen = () => modalRef.current?.showModal()
 
     return (
         <div className="flex-1 flex flex-col">
@@ -99,6 +101,8 @@ export default function Admins() {
                     <Item name="searchPanel" />
                 </Toolbar>
             </DataGrid>
+
+            <AddAdminModal modalRef={modalRef} />
         </div>
     )
 }
