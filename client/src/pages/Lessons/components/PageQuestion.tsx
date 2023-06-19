@@ -2,6 +2,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import ChoiceBlock from "./ChoiceBlock";
 import TitleBlock from "./TitleBlock";
+import SortableList from "../../../components/DnD/SortableList";
 
 type Question = {
     title: string;
@@ -59,6 +60,11 @@ function PageQuestion({
         onQuestionChange(questionId, { title, answer, choices: newChoices })
     }
 
+    const handleSortChoices = (choices: { value: string, index: number }[]) => {
+        const newChoices = choices.map(({ value }) => value)
+        onQuestionChange(questionId, { title, answer, choices: newChoices })
+    }
+
     return (
         <div className="flex flex-col">
             <TitleBlock
@@ -67,19 +73,24 @@ function PageQuestion({
                 onChange={handleTitleChange}
             />
             <div className="flex flex-col space-y-4 mt-6">
-                {choices.map((value, index) => (
-                    <ChoiceBlock
-                        key={index}
-                        questionId={questionId}
-                        id={index}
-                        value={value}
-                        answer={answer}
-                        editMode={isEditMode}
-                        onChange={handleChangeChoice}
-                        onDelete={handleDeleteChoice}
-                        onSelect={handleAnswerChange}
-                    />
-                ))}
+                <SortableList
+                    items={choices.map((value, index) => ({ value, index }))}
+                    onSort={handleSortChoices}
+                    keyExtractor={(item) => item.index}
+                    renderItem={({ value }, index) => (
+                        <ChoiceBlock
+                            key={index}
+                            questionId={questionId}
+                            id={index}
+                            value={value}
+                            answer={answer}
+                            editMode={isEditMode}
+                            onChange={handleChangeChoice}
+                            onDelete={handleDeleteChoice}
+                            onSelect={handleAnswerChange}
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-1 justify-between pt-4">
                 <div className="space-x-2">
