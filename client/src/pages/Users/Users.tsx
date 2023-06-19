@@ -1,10 +1,21 @@
 import DataGrid, { Column, HeaderFilter, Item, Pager, Paging, SearchPanel, Toolbar } from "devextreme-react/data-grid";
 import trpc from '../../services/trpc';
 import ImageCell from "./components/ImageCell";
+import { DocumentMinusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+
+type User = {
+    id: string
+    username: string
+    xp: number
+    current_lesson: string
+    avatar?: string
+}
 
 export default function Users() {
     const pageSizes = [5, 10, 20]
     const { data } = trpc.user.getAllUsers.useQuery()
+    const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
     return (
         <div className="flex-1 flex flex-col">
@@ -21,6 +32,7 @@ export default function Users() {
                 columnAutoWidth
                 allowColumnResizing
                 className="card p-8 rounded-md shadow-sm bg-base-100 mt-10 w-full"
+                onRowClick={({ data }) => setSelectedUser(data)}
             >
                 <HeaderFilter visible={true} />
                 <SearchPanel visible={true} highlightCaseSensitive={true} width={200} />
@@ -48,8 +60,18 @@ export default function Users() {
                     <Item name="groupPanel" />
                     <Item location="before">
                         <p className="text-md text-neutral-500 text-lg font-semibold">
-                            Lesson previews
+                            List of users
                         </p>
+                    </Item>
+                    <Item location="after" visible={!!selectedUser}>
+                        <a className="btn btn-sm hover:btn-error" title="Delete user">
+                            <TrashIcon className="h-4 w-4" />
+                        </a>
+                    </Item>
+                    <Item location="after" visible={!!selectedUser}>
+                        <a className="btn btn-sm hover:btn-error" title="Wipe user's data">
+                            <DocumentMinusIcon className="h-4 w-4" />
+                        </a>
                     </Item>
                     <Item name="addRowButton" showText="always" />
                     <Item name="exportButton" />
