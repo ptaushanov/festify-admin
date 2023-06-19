@@ -9,6 +9,7 @@ import {
     useSensors,
     UniqueIdentifier,
     DragEndEvent,
+    MouseSensor,
 } from '@dnd-kit/core';
 
 import {
@@ -32,7 +33,7 @@ function SortableList<T, K extends UniqueIdentifier>({
     renderItem
 }: SortableListProps<T, K>) {
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 100 } }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
