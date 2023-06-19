@@ -1,4 +1,5 @@
 import { router } from '../trpc.js';
+import { adminRouter } from './adminRouter.js';
 import { emailRouter } from './emailRouter.js';
 import { homeRouter } from './homeRouter.js';
 import { lessonRouter } from './lessonsRouter.js';
@@ -14,7 +15,8 @@ export const appRouter = router({
     reward: rewardRouter,
     email: emailRouter,
     notification: notificationRouter,
-    user: userRouter
+    user: userRouter,
+    admin: adminRouter
 });
 
 // export type definition of API
