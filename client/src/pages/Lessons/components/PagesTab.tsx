@@ -4,15 +4,17 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import PageContent from "./PageContent";
 import trpc from "../../../services/trpc";
 
+type Pages = Record<string, {
+    value: string;
+    type: "text" | "image";
+    oldValue?: string;
+}[]>;
+
 interface PagesTabProps {
     season: "spring" | "summer" | "autumn" | "winter";
     lessonId: string;
     holidayName?: string;
-    pages?: Record<string, {
-        value: string;
-        type: "text" | "image";
-        oldValue?: string
-    }[]>
+    pages?: Pages
 }
 
 function PagesTab({
@@ -22,7 +24,7 @@ function PagesTab({
     holidayName = ""
 }: PagesTabProps
 ) {
-    const [modifiedPages, setModifiedPages] = useState(pages)
+    const [modifiedPages, setModifiedPages] = useState<Pages>(pages)
     const [isEditing, setIsEditing] = useState<boolean>(false)
 
     const lessonContentMutation = trpc.lesson.updateLessonContent.useMutation()
@@ -67,6 +69,15 @@ function PagesTab({
         setModifiedPages({ ...modifiedPages, [pageId]: newPage })
     }
 
+    const handleSortContent = (
+        pageId: string, items: { type: "text" | "image", value: string }[]
+    ) => {
+        setModifiedPages({
+            ...modifiedPages,
+            [pageId]: items.map(({ type, value }) => ({ type, value }))
+        })
+    }
+
     const handleSavePages = () => {
         lessonContentMutation.mutate({
             season,
@@ -91,6 +102,7 @@ function PagesTab({
                 isEditMode={isEditing}
                 setEditMode={setIsEditing}
                 onContentChange={handleContentChange}
+                onSortContent={handleSortContent}
                 onCreateContentBlock={handleCreateContentBlock}
                 onDeleteContentBlock={handleDeleteContentBlock}
                 onCreatePage={handleCreatePage}

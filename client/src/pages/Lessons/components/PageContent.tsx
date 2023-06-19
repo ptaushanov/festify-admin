@@ -2,6 +2,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import ContentBlock from "./ContentBlock";
 import React, { useRef } from "react";
 import ContentModal from "./ContentModal";
+import SortableList from "../../../components/DnD/SortableList";
 
 interface PageContentProps {
     holidayName: string;
@@ -13,6 +14,7 @@ interface PageContentProps {
     isEditMode: boolean;
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
     onContentChange: (pageId: string, id: number, newValue: string, oldValue?: string) => void;
+    onSortContent: (pageId: string, items: { type: "text" | "image", value: string }[]) => void;
     onCreateContentBlock: (pageId: string, type: "image" | "text") => void;
     onDeleteContentBlock: (pageId: string, id: number) => void;
     onCreatePage: () => void;
@@ -27,6 +29,7 @@ function PageContent({
     isEditMode,
     setEditMode,
     onContentChange,
+    onSortContent,
     onCreateContentBlock,
     onDeleteContentBlock,
     onCreatePage,
@@ -50,18 +53,22 @@ function PageContent({
                 {holidayName}
             </h3>
             <div className="flex flex-col space-y-4">
-                {content.map(({ type, value }, index) => (
-                    <ContentBlock
-                        key={index}
-                        pageId={pageId}
-                        id={index}
-                        type={type}
-                        value={value}
-                        editMode={isEditMode}
-                        onContentChange={onContentChange}
-                        onDelete={onDeleteContentBlock}
-                    />
-                ))}
+                <SortableList
+                    items={content.map((item, index) => ({ ...item, index }))}
+                    onSort={(items) => onSortContent(pageId, items)}
+                    keyExtractor={(item) => item.index}
+                    renderItem={({ type, value }, index) => (
+                        <ContentBlock
+                            pageId={pageId}
+                            id={index}
+                            type={type}
+                            value={value}
+                            editMode={isEditMode}
+                            onContentChange={onContentChange}
+                            onDelete={onDeleteContentBlock}
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-1 justify-between pt-4">
                 <div className="space-x-2">
