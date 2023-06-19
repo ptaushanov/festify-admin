@@ -3,6 +3,7 @@ import trpc from '../../services/trpc';
 import ImageCell from "./components/ImageCell";
 import { DocumentMinusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 type User = {
     id: string
@@ -16,6 +17,20 @@ export default function Users() {
     const pageSizes = [5, 10, 20]
     const { data } = trpc.user.getAllUsers.useQuery()
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
+
+    const userWipeDataMutation = trpc.user.wipeUserData.useMutation()
+    const trpcContext = trpc.useContext()
+
+    const handleDeleteUser = () => null
+    const handleWipeUserData = () => {
+        if (!selectedUser) return
+        userWipeDataMutation.mutate(selectedUser.id, {
+            onSuccess: ({ message }) => {
+                trpcContext.user.getAllUsers.invalidate()
+                toast.success(message)
+            }
+        })
+    }
 
     return (
         <div className="flex-1 flex flex-col">
@@ -64,12 +79,20 @@ export default function Users() {
                         </p>
                     </Item>
                     <Item location="after" visible={!!selectedUser}>
-                        <a className="btn btn-sm hover:btn-error" title="Delete user">
+                        <a
+                            className="btn btn-sm hover:btn-error"
+                            title="Delete user"
+                            onClick={handleDeleteUser}
+                        >
                             <TrashIcon className="h-4 w-4" />
                         </a>
                     </Item>
                     <Item location="after" visible={!!selectedUser}>
-                        <a className="btn btn-sm hover:btn-error" title="Wipe user's data">
+                        <a
+                            className="btn btn-sm hover:btn-error"
+                            title="Wipe user's data"
+                            onClick={handleWipeUserData}
+                        >
                             <DocumentMinusIcon className="h-4 w-4" />
                         </a>
                     </Item>
