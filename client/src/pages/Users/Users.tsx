@@ -1,9 +1,17 @@
-import DataGrid, { Column, HeaderFilter, Item, Pager, Paging, SearchPanel, Toolbar } from "devextreme-react/data-grid";
 import trpc from '../../services/trpc';
 import ImageCell from "./components/ImageCell";
 import { DocumentMinusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import DataGrid, {
+    Column,
+    HeaderFilter,
+    Item,
+    Pager,
+    Paging,
+    SearchPanel,
+    Toolbar
+} from "devextreme-react/data-grid";
 
 type User = {
     id: string
@@ -19,9 +27,19 @@ export default function Users() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
     const userWipeDataMutation = trpc.user.wipeUserData.useMutation()
+    const userDeleteMutation = trpc.user.deleteUser.useMutation()
     const trpcContext = trpc.useContext()
 
-    const handleDeleteUser = () => null
+    const handleDeleteUser = () => {
+        if (!selectedUser) return
+        userDeleteMutation.mutate(selectedUser.id, {
+            onSuccess: ({ message }) => {
+                trpcContext.user.getAllUsers.invalidate()
+                toast.success(message)
+            }
+        })
+    }
+
     const handleWipeUserData = () => {
         if (!selectedUser) return
         userWipeDataMutation.mutate(selectedUser.id, {

@@ -38,6 +38,32 @@ export async function wipeUserData(userId: string) {
     return { message: "User data wiped successfully" }
 }
 
+
+export async function deleteUser(userId: string) {
+    const userDoc = await getUserDoc(userId);
+    checkUserDocExists(userDoc);
+    const { avatar } = userDoc.data() as { avatar?: string }
+
+    if (avatar) await deleteImage(avatar);
+    await deleteUserDoc(userDoc);
+
+    return { message: "User deleted successfully" }
+}
+
+async function deleteUserDoc(
+    userDoc: admin.firestore.DocumentSnapshot<admin.firestore.DocumentData>
+) {
+    try {
+        await userDoc.ref.delete();
+        await admin.auth().deleteUser(userDoc.id);
+    } catch (error) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to delete user",
+        });
+    }
+}
+
 async function updateWithWipedData(
     userDoc: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>
 ) {

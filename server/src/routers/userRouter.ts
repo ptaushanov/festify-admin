@@ -1,6 +1,6 @@
 import { router } from '../trpc.js';
 import protectedProcedure from '../procedures/protectedProcedure.js';
-import { getAllUsers, viewUsersOutputSchema, wipeUserData } from '../services/userService.js';
+import { deleteUser, getAllUsers, viewUsersOutputSchema, wipeUserData } from '../services/userService.js';
 import { z } from 'zod';
 
 export const userRouter = router({
@@ -14,5 +14,11 @@ export const userRouter = router({
         .input(z.string())
         .mutation(async ({ input: userId }) => {
             return await wipeUserData(userId);
+        }),
+
+    deleteUser: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input: userId }) => {
+            return await deleteUser(userId);
         })
 });
