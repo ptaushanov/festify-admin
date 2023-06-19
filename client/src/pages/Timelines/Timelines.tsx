@@ -98,7 +98,7 @@ export default function Timelines() {
                     <Item name="groupPanel" />
                     <Item location="before">
                         <p className="text-md text-neutral-500 text-lg font-semibold">
-                            Lesson previews
+                            Timeline previews
                         </p>
                     </Item>
                     <Item name="addRowButton" showText="always" />

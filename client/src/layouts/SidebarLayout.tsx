@@ -6,7 +6,8 @@ import {
     AcademicCapIcon,
     StarIcon,
     EnvelopeIcon,
-    CubeIcon
+    CubeIcon,
+    ArrowRightOnRectangleIcon
 } from "@heroicons/react/24/outline"
 import { NavLink, Link } from 'react-router-dom';
 import { Toaster } from "react-hot-toast";
@@ -33,13 +34,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                         </label>
                         <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 z-20">
                             <li>
-                                <a className="justify-between">
-                                    Profile
-                                    <span className="badge">New</span>
+                                <a onClick={signOut} className="flex items-center">
+                                    <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                                    <span>Sign out</span>
                                 </a>
                             </li>
-                            <li><a>Settings</a></li>
-                            <li><a onClick={signOut}>Logout</a></li>
                         </ul>
                     </div>
                 </div>
