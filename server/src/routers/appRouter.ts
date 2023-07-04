@@ -2,7 +2,7 @@ import { router } from '../trpc.js';
 import { adminRouter } from './adminRouter.js';
 import { emailRouter } from './emailRouter.js';
 import { homeRouter } from './homeRouter.js';
-import { lessonRouter } from './lessonsRouter.js';
+import { lessonRouter } from './lessonRouter.js';
 import { notificationRouter } from './notificationRouter.js';
 import { rewardRouter } from './rewardRouter.js';
 import { timelineRouter } from './timelineRouter.js';
