@@ -3,7 +3,6 @@ import trpc from '../../../services/trpc';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-import toast from "react-hot-toast";
 
 interface GeneralTabProps {
     season: "spring" | "summer" | "autumn" | "winter";

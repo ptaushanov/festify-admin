@@ -40,7 +40,7 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
     }
 
     const handleErrorResponse = (error: unknown): Promise<void> | void => {
-        const isTRPCClientError = error instanceof TRPCClientError<AppRouter>
+        const isTRPCClientError = error instanceof TRPCClientError
         if (isTRPCClientError) return handleTRPCClientError(error)
 
         const isGenericError = error instanceof Error;

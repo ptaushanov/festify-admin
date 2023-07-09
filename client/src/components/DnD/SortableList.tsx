@@ -9,7 +9,6 @@ import {
     useSensors,
     UniqueIdentifier,
     DragEndEvent,
-    MouseSensor,
 } from '@dnd-kit/core';
 
 import {

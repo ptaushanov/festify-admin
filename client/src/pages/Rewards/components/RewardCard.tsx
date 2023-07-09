@@ -10,7 +10,7 @@ interface RewardCardProps {
 }
 
 function RewardCard({ reward, onEdit }: RewardCardProps) {
-    const { id, name, thumbnail } = reward
+    const { name, thumbnail } = reward
 
     return (
         <div className="card w-60 h-[18rem] bg-base-100 shadow-md self-center">
