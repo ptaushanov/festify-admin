@@ -8,6 +8,7 @@ Firebase Firestore for real-time updates and offers gamification elements to
 engage and motivate students in their learning.
 
 ## 📱 Screenshots 📱
+![image](https://github.com/ptaushanov/festify-admin/assets/33032001/b1e0ee50-18d3-4869-bb94-ebe4bd0c9757)
 
 ## 🛠️ Build with 🛠️
 
